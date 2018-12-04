@@ -17,5 +17,8 @@ class WerewolfBot extends Bot {
         else if ($this->messageText === '/test') {
             $this->sendMessage('TEST TEST TEST!');
         }
+        else if ($this->messageText === '/silver') {
+            $this->sendMessage('Hawk!');
+        }
     }
 }
