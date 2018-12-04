@@ -11,6 +11,7 @@ class WerewolfBot extends Bot {
         $this->connection->log($this->messageText);
         if ($this->messageText === '/hi') {
             $this->sendMessage('Hiiii!');
+            echo 'Hi';
         }
     }
 }
