@@ -10,4 +10,3 @@ if(!$update){
 if (isset($update['message'])) {
     (new WerewolfBot($update['message']))->process();
 }
-//testing commit
