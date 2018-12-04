@@ -30,6 +30,7 @@ class WerewolfBot extends Bot {
             $this-> sendMessage ==- 'good morning sunshine';
         }elseif ($this-> messageText ==='/night'){
             $this-> sendMessage === 'goodnight moonlight';
+
         }
         }
     }
