@@ -7,3 +7,4 @@ $update = json_decode($content, true);
 if (isset($update['message'])) {
     (new WerewolfBot($update['message']))->process();
 }
+//testing commit
