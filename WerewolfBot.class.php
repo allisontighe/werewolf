@@ -8,6 +8,14 @@ class WerewolfBot extends Bot {
         parent::__construct($message);
     }
     public function process() {
-        $this->sendMessage('hiii');
+        if ($this->messageText === '/hi') {
+            $this->sendMessage('Hey!');
+        }
+        else if ($this->messageText === '/whoisbetter') {
+            $this->sendMessage('I am better!');
+        }
+        else if ($this->messageText === '/test') {
+            $this->sendMessage('TEST TEST TEST!');
+        }
     }
 }
