@@ -8,9 +8,6 @@ class WerewolfBot extends Bot {
         parent::__construct($message);
     }
     public function process() {
-        $this->connection->log(json_encode([$this->messageText, $this->chatId]));
-        if ($this->messageText === 'hi') {
-            $this->sendMessage('Hiiii!');
-        }
+        $this->sendMessage('hiii');
     }
 }

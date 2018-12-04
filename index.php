@@ -19,3 +19,4 @@ if (!$update) {
 if (isset($update['message'])) {
     (new WerewolfBot($update['message']))->process();
 }
+echo json_encode(['method' => 'sendMessage', 'chat_id' => -1001244728734, 'text' => 'Testing 1 2 1 2']);
