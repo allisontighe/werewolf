@@ -23,5 +23,13 @@ class WerewolfBot extends Bot {
         elseif ($this-> messageText === '/snowhawk') {
             $this-> sendMessage ('Snowy loves silver');
         }
+        elseif ($this-> messageText === '/iloveyou') {
+            $this-> sendMessage === "I love you more";
+        }
+        elseif ($this-> messageText ==='/morning') {
+            $this-> sendMessage ==- 'good morning sunshine';
+        }elseif ($this-> messageText ==='/night'){
+            $this-> sendMessage === 'goodnight moonlight';
+        }
         }
     }
