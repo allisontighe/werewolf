@@ -6,9 +6,9 @@ class Bot {
     protected $messageId;
     protected $messageText;
     public function __construct(array $message) {
-        $this->chatId = $message['chat']['id'] ?? 0;
-        $this->userId = $message['from']['id'] ?? 0;
-        $this->messageId = $message['message_id'] ?? 0;
+        $this->chatId = (int)$message['chat']['id'] ?? 0;
+        $this->userId = (int)$message['from']['id'] ?? 0;
+        $this->messageId = (int)$message['message_id'] ?? 0;
         $this->messageText = $message['text'] ?? 0;
         $this->messageText = json_encode($message);
     }
