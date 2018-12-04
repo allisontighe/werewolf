@@ -11,7 +11,7 @@ class Bot {
         $this->messageId = (int)$message['message_id'] ?? 0;
         $this->messageText = $message['text'] ?? 0;
     }
-    private function send(string $method, array $parameters): string {
+    private function send($method, $parameters) {
         $curl = curl_init('https://api.telegram.com/bot'.Config::BOT_TOKEN.'/'.$method);
         curl_setopt($curl, CURLOPT_HEADER, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
