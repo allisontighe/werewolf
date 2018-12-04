@@ -28,6 +28,6 @@ class Bot {
         echo json_encode($parameters);
     }
     protected function sendMessage($message) {
-        $this->sendEcho('sendMessage', ['chat_id' => $this->chatId, 'text' => $message]);
+        $this->send('sendMessage', ['chat_id' => $this->chatId, 'text' => $message]);
     }
 }
