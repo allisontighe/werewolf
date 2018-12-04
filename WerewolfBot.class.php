@@ -1,9 +1,6 @@
 <?php
 require_once 'Bot.class.php';
 class WerewolfBot extends Bot {
-    public function __construct(array $message) {
-        parent::__construct($message);
-    }
     public function process() {
         if ($this->messageText === '/hi') {
             $this->sendMessage('Hey!');
