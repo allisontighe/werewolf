@@ -1,6 +1,6 @@
 <?php
 function doesChatIdExist(Connection $connection, int $chatId): bool {
-    $PDOStatement = $connection->prepare('SELECT COUNT(chat_id) FROM players WHERE chat_id = ?');
+    $PDOStatement = $connection->prepare('SELECT COUNT(chat_id) FROM chats WHERE chat_id = ?');
     $PDOStatement->execute([$chatId]);
     return boolval($PDOStatement->fetchColumn());
 }

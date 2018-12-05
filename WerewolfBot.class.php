@@ -15,7 +15,7 @@ class WerewolfBot extends Bot {
     }
     private function readCommand() {
         if ($this->messageText === '/hi') {
-            $this->responseText = 'Hey!!';
+            $this->responseText = 'Bye!';
         }
         else if ($this->messageText === '/newgame') {
             //check if a game is already running
