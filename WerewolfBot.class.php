@@ -20,12 +20,12 @@ class WerewolfBot extends Bot {
         }
         else if ($this->messageText === '/newgame') {
             //check if a game is already running
-            if (doesChatIdExist($this->connection, $this->chatId)) {
-                http_response_code(200);
-                exit('A game is already running');
+            if (doesChatIdExist($this->connection, $this->chatId)) {//echo to clear output buffer
+                return $this->sendEcho('A game has already started!');
             }
             addChat($this->connection, $this->chatId);
             addToGame($this->connection, $this->chatId, $this->telegramId, $this->firstName);
+            $this->sendEcho('A werewolf game is starting!'); //echo to clear output buffer
             return $this->beginGameSequence();
         }
         else if ($this->messageText === '/join') {
@@ -51,7 +51,6 @@ class WerewolfBot extends Bot {
         return $string;
     }
     private function beginGameSequence() {
-        $this->sendMessageToChat('A werewolf game has started!');
         $playerListMessage = json_decode($this->sendMarkdownMessage($this->makePlayerList()), true);
         $playerListMessage = intval($playerListMessage['result']['message_id']);
         //wait for joiners

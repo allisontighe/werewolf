@@ -24,6 +24,12 @@ class Bot {
         curl_close($curl);
         return $response;
     }
+    protected function sendEcho(string $message) {
+        http_response_code(200);
+        echo json_encode(['method' => 'sendMessage', 'chat_id' => $this->chatId, 'text' => $message]);
+        ob_flush();
+        flush();
+    }
     protected function sendMessageToChat(string $message) {
         $this->send('sendMessage', ['chat_id' => $this->chatId, 'text' => $message]);
     }
