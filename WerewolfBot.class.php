@@ -56,18 +56,18 @@ class WerewolfBot extends Bot {
         $playerListMessage = intval($playerListMessage['result']['message_id']);
         //wait for joiners
         $i = 0;
-        $limit = 2;
-        while($i < $limit) {
+        $limit = 1;
+        do {
             if (!doesChatIdExist($this->connection, $this->chatId)) {
                 http_response_code(200);
                 exit('Chat is no longer exists'); //chat id no longer exists!!
             }
-            $timeLeft = ($limit - $i) * 30;
+            $timeLeft = (1 + $limit - $i) * 30;
             $this->sendMessageToChat($timeLeft.' seconds left to join!');
             $this->editMessage($playerListMessage, $this->makePlayerList());
-            $i++;
             sleep(30);
         }
+        while($i++ < $limit);
         $this->sendMessageToChat('Joining period ended! Please wait while the roles are assigned!');
         $players = getTelegramIdsFromChat($this->connection, $this->chatId);
         //shuffle players
