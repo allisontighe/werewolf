@@ -10,12 +10,13 @@ class WerewolfBot extends Bot {
         parent::__construct($message);
     }
     public function process() {
+        //set header
+        http_response_code(200);
+        flush();
         $this->readCommand();
         if (!empty($this->responseText)) $this->sendMessageToChat($this->responseText);
     }
     private function readCommand() {
-        //set header
-        http_response_code(200);
         
         if ($this->messageText === '/hi') {
             $this->responseText = 'Bye!';
@@ -77,7 +78,7 @@ class WerewolfBot extends Bot {
                 setRole($this->connection, $this->chatId, $player, $role['id']);
             }
             //message player
-            $this->sendMessageToPlayer('You are a '.$role['name'].chr(10).$role['description']);
+            $this->sendMessageToPlayer('You are a '.$role['name'].chr(10).$role['description'], $player);
         }
         return $this->endGame();
     }

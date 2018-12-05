@@ -27,7 +27,7 @@ class Bot {
     protected function sendMessageToChat(string $message) {
         $this->send('sendMessage', ['chat_id' => $this->chatId, 'text' => $message]);
     }
-    protected function sendMessageToPlayer(string $message) {
-        $this->send('sendMessage', ['chat_id' => $this->telegramId, 'text' => $message]);
+    protected function sendMessageToPlayer(string $message, int $playerId) {
+        $this->send('sendMessage', ['chat_id' => $playerId, 'text' => $message]);
     }
 }
