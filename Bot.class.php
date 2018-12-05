@@ -24,7 +24,10 @@ class Bot {
         curl_close($curl);
         return $response;
     }
-    protected function sendMessage($message) {
+    protected function sendMessageToChat(string $message) {
         $this->send('sendMessage', ['chat_id' => $this->chatId, 'text' => $message]);
+    }
+    protected function sendMessageToPlayer(string $message) {
+        $this->send('sendMessage', ['chat_id' => $this->telegramId, 'text' => $message]);
     }
 }

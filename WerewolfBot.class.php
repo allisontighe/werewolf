@@ -11,7 +11,7 @@ class WerewolfBot extends Bot {
     }
     public function process() {
         $this->readCommand();
-        if (!empty($this->responseText)) $this->sendMessage($this->responseText);
+        if (!empty($this->responseText)) $this->sendMessageToChat($this->responseText);
     }
     private function readCommand() {
         if ($this->messageText === '/hi') {
@@ -22,15 +22,8 @@ class WerewolfBot extends Bot {
             if (doesChatIdExist($this->connection, $this->chatId)) {
                 return $this->responseText = 'A game is already running!';
             }
-            $i = 0;
-            $limit = 5;
-            while($i < $limit) {
-                $timeLeft = ($limit - $i) * 30;
-                $this->sendMessage($timeLeft.' seconds left to join!');
-                $i++;
-                sleep(2);
-            }
-            return $this->responseText = 'The game has started!';
+            addChat($this->connection, $this->chatId);
+            return $this->beginGameSequence();
         }
         else if ($this->messageText === '/join') {
             //check if already joined
@@ -45,5 +38,50 @@ class WerewolfBot extends Bot {
             deleteChatId($this->connection, $this->chatId);
             return $this->responseText = 'Forcefully ended the game!';
         }
+    }
+    private function beginGameSequence() {
+        $this->waitForJoiners();
+        $this->sendMessageToChat('The game has started! Please wait while the roles are assigned!');
+        $players = getTelegramIdsFromChat($this->connection, $this->chatId);
+        //shuffle players
+        shuffle($players);
+        $goodRoles = getGoodRoles($this->connection);
+        $evilRoles = getEvilRoles($this->connection);
+        $totalPlayers = count($players);
+        $baddies = ceil($totalPlayers / 5);
+        $assignedBaddies = 0;
+        foreach($players as $player) {
+            if ($assignedBaddies < $baddies) {
+                //set random evil role
+                $role = $evilRoles[array_rand($evilRoles)];
+                setRole($this->connection, $this->chatId, $player, $role['id']);
+                $assignedBaddies++;
+            }
+            else {
+                //set a good role
+                $role = $goodRoles[array_rand($goodRoles)];
+                setRole($this->connection, $this->chatId, $player, $role['id']);
+            }
+            //message player
+            $this->sendMessageToPlayer('You are a '.$role['name'].chr(10).$role['description']);
+        }
+        return $this->endGame();
+    }
+    private function waitForJoiners() {
+        $i = 0;
+        $limit = 2;
+        while($i < $limit) {
+            if (!doesChatIdExist($this->connection, $this->chatId)) {
+                break; //chat id no longer exists!!
+            }
+            $timeLeft = ($limit - $i) * 30;
+            $this->sendMessageToChat($timeLeft.' seconds left to join!');
+            $i++;
+            sleep(30);
+        }
+    }
+    private function endGame() {
+        $this->sendMessageToChat('The game has ended!');
+        deleteChatId($this->connection, $this->chatId);
     }
 }
