@@ -1,37 +1,31 @@
 <?php
 require_once 'Bot.class.php';
+require_once 'Connection.class.php';
+require_once 'functions.php';
 class WerewolfBot extends Bot {
+    private $connection;
+    private $responseText;
+    public function __construct(array $message) {
+        $this->connection = new Connection;
+        parent::__construct($message);
+    }
     public function process() {
+        $this->readCommand();
+        if (!empty($this->responseText)) $this->sendMessage($this->responseText);
+    }
+    private function readCommand() {
         if ($this->messageText === '/hi') {
-            $this->sendMessage('Hey!');
+            $this->responseText = 'Hey!!';
         }
-        else if ($this->messageText === '/whoisbetter') {
-            $this->sendMessage('I am better!');
+        else if ($this->messageText === '/newgame') {
+            //check if a game is already running
+            if (doesChatIdExist($this->connection, $this->chatId)) {
+                return $this->responseText = 'A game is already running!';
+            }
+            
         }
-        else if ($this->messageText === '/test') {
-            $this->sendMessage('TEST TEST TEST!');
-        }
-        else if ($this->messageText === '/silver') {
-            $this->sendMessage('Hawk!');
-        }
-        elseif ($this-> messageText === '/arc') {
-            $this-> sendMessage ('Arc is Awesome');
-        }
-        elseif ($this-> messageText === '/silversnow') {
-            $this-> sendMessage ('Silver loves Snowy');
-        }
-        elseif ($this-> messageText === '/snowhawk') {
-            $this-> sendMessage ('Snowy loves silver');
-        }
-        elseif ($this-> messageText === '/iloveyou') {
-            $this-> sendMessage ('ily more');
-        }
-        elseif ($this-> messageText ==='/morning') {
-            $this-> sendMessage ('morning sunshine');
-        }
-        elseif ($this-> messageText ==='/night'){
-            $this-> sendMessage ('goodnight moonlight');
-
+        else if ($this->messageText === '/endgame') {
+            //end game
         }
     }
 }

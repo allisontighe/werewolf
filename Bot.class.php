@@ -22,11 +22,6 @@ class Bot {
         curl_close($curl);
         return $response;
     }
-    private function sendEcho($method, $parameters) {
-        $parameters['method'] = $method;
-        header('Content-Type: application/json');
-        echo json_encode($parameters);
-    }
     protected function sendMessage($message) {
         $this->send('sendMessage', ['chat_id' => $this->chatId, 'text' => $message]);
     }

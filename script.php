@@ -1,16 +1,16 @@
 <?php
 require_once 'Connection.class.php';
-if ($_GET['key'] === 'applesarefruits' && $_GET['action'] === 'createtable') {
+if ($_GET['action'] === 'alter') {
+    $connection = new Connection;
     try {
-        $conn = new Connection;
-        $conn->query('TRUNCATE TABLE players');
-        $resultSet = $conn->query('SELECT * FROM players')->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode($resultSet);
+        $query = 'ALTER TABLE players ADD COLUMN telegramId BIGINT';
+        $connection->exec($query);
+        echo 'Executed: '.$query;
+        $query = 'ALTER TABLE players ADD COLUMN name VARCHAR(50)';
+        $connection->exec($query);
+        echo 'Executed: '.$query;
     }
     catch(PDOException $e) {
         echo $e->getMessage();
     }
-}
-else {
-    echo 'Scripts page';
 }
