@@ -14,7 +14,7 @@ function deleteChatId(Connection $connection, int $chatId) {
     $PDOStatement->execute([$chatId]);
 }
 function addToGame(Connection $connection, int $chatId, int $telegramId, string $name) {
-    $PDOStatement = $connection->prepare('INSERT INTO players (chat_id, telegram_id, name) VALUES (?, ?, ?)');
+    $PDOStatement = $connection->prepare('INSERT INTO players (chat_id, telegram_id, name, role) VALUES (?, ?, ?, 0)');
     $PDOStatement->execute([$chatId, $telegramId, $name]);
 }
 function addChat(Connection $connection, int $chatId) {
