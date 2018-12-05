@@ -19,6 +19,7 @@ class WerewolfBot extends Bot {
             $this->responseText = 'Bye!';
         }
         else if ($this->messageText === '/newgame') {
+            return $this->responseText = 'I dont wanna play wid u';
             //check if a game is already running
             if (doesChatIdExist($this->connection, $this->chatId)) {//echo to clear output buffer
                 return $this->sendEcho('A game has already started!');
