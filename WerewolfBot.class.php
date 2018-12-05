@@ -22,7 +22,15 @@ class WerewolfBot extends Bot {
             if (doesChatIdExist($this->connection, $this->chatId)) {
                 return $this->responseText = 'A game is already running!';
             }
-            
+            $i = 0;
+            $limit = 5;
+            while($i < $limit) {
+                $timeLeft = ($limit - $i) * 30;
+                $this->sendMessage($timeLeft.' seconds left to join!');
+                $i++;
+                sleep(2);
+            }
+            return $this->responseText = 'The game has started!';
         }
         else if ($this->messageText === '/join') {
             //check if already joined
