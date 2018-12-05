@@ -40,7 +40,18 @@ class WerewolfBot extends Bot {
         }
     }
     private function beginGameSequence() {
-        $this->waitForJoiners();
+        //wait for joiners
+        $i = 0;
+        $limit = 2;
+        while($i < $limit) {
+            if (!doesChatIdExist($this->connection, $this->chatId)) {
+                break; //chat id no longer exists!!
+            }
+            $timeLeft = ($limit - $i) * 30;
+            $this->sendMessageToChat($timeLeft.' seconds left to join!');
+            $i++;
+            sleep(30);
+        }
         $this->sendMessageToChat('The game has started! Please wait while the roles are assigned!');
         $players = getTelegramIdsFromChat($this->connection, $this->chatId);
         //shuffle players
@@ -66,19 +77,6 @@ class WerewolfBot extends Bot {
             $this->sendMessageToPlayer('You are a '.$role['name'].chr(10).$role['description']);
         }
         return $this->endGame();
-    }
-    private function waitForJoiners() {
-        $i = 0;
-        $limit = 2;
-        while($i < $limit) {
-            if (!doesChatIdExist($this->connection, $this->chatId)) {
-                break; //chat id no longer exists!!
-            }
-            $timeLeft = ($limit - $i) * 30;
-            $this->sendMessageToChat($timeLeft.' seconds left to join!');
-            $i++;
-            sleep(30);
-        }
     }
     private function endGame() {
         $this->sendMessageToChat('The game has ended!');
