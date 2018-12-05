@@ -33,5 +33,5 @@ class WerewolfBot extends Bot {
             $this-> sendMessage ('goodnight moonlight');
 
         }
-        }
+    }
 }
