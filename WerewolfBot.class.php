@@ -59,7 +59,8 @@ class WerewolfBot extends Bot {
         $limit = 2;
         while($i < $limit) {
             if (!doesChatIdExist($this->connection, $this->chatId)) {
-                break; //chat id no longer exists!!
+                http_response_code(200);
+                exit('Chat is no longer exists'); //chat id no longer exists!!
             }
             $timeLeft = ($limit - $i) * 30;
             $this->sendMessageToChat($timeLeft.' seconds left to join!');
