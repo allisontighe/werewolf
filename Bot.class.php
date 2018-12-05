@@ -1,15 +1,17 @@
 <?php
 class Bot {
     protected $chatId;
-    protected $userId;
+    protected $telegramId;
+    protected $firstName;
     protected $messageId;
     protected $messageText;
     private const TOKEN = '682186483:AAEfr0p9f2wzYvtA6ay816aQ3HJnG7kW77E';
     public function __construct(array $message) {
         $this->chatId = (int)$message['chat']['id'] ?? 0;
-        $this->userId = (int)$message['from']['id'] ?? 0;
+        $this->telegramId = (int)$message['from']['id'] ?? 0;
         $this->messageId = (int)$message['message_id'] ?? 0;
-        $this->messageText = $message['text'] ?? 0;
+        $this->messageText = $message['text'] ?? '';
+        $this->firstName = $message['from']['first_name'] ?? '';
     }
     private function send($method, $parameters) {
         $curl = curl_init('https://api.telegram.org/bot'.self::TOKEN.'/'.$method);

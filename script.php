@@ -1,6 +1,6 @@
 <?php
 require_once 'Connection.class.php';
-if ($_GET['action'] === 'alter') {
+if ($_GET['action'] === 'alter' && false) {
     $connection = new Connection;
     try {
         $query = 'ALTER TABLE players ADD COLUMN telegramId BIGINT';
