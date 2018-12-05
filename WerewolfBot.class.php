@@ -14,6 +14,9 @@ class WerewolfBot extends Bot {
         if (!empty($this->responseText)) $this->sendMessageToChat($this->responseText);
     }
     private function readCommand() {
+        //set header
+        http_response_code(200);
+        
         if ($this->messageText === '/hi') {
             $this->responseText = 'Bye!';
         }
