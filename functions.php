@@ -36,3 +36,8 @@ function setRole(Connection $connection, int $chatId, int $telegramId, int $role
     $PDOStatement = $connection->prepare('UPDATE players SET role = ? WHERE chat_id = ? AND telegram_id = ?');
     $PDOStatement->execute([$role, $chatId, $telegramId]);
 }
+function getTelegramNamesFromChat(Connection $connection, int $chatId): array {
+    $PDOStatement = $connection->prepare('SELECT name FROM players WHERE chat_id = ?');
+    $PDOStatement->execute([$chatId]);
+    return $PDOStatement->fetchAll(PDO::FETCH_COLUMN);
+}

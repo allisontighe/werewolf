@@ -27,7 +27,13 @@ class Bot {
     protected function sendMessageToChat(string $message) {
         $this->send('sendMessage', ['chat_id' => $this->chatId, 'text' => $message]);
     }
+    protected function sendMarkdownMessage(string $message) {
+        $this->send('sendMessage', ['chat_id' => $this->chatId, 'text' => $message, 'parse_mode' => 'Markdown']);
+    }
     protected function sendMessageToPlayer(string $message, int $playerId) {
         $this->send('sendMessage', ['chat_id' => $playerId, 'text' => $message]);
+    }
+    protected function editMessage(int $messageId, string $message) {
+        $this->send('editMessageText', ['chat_id' => $this->chatId, 'message_id' => $messageId, 'text' => $message]);
     }
 }

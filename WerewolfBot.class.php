@@ -10,9 +10,6 @@ class WerewolfBot extends Bot {
         parent::__construct($message);
     }
     public function process() {
-        //set header
-        http_response_code(200);
-        flush();
         $this->readCommand();
         if (!empty($this->responseText)) $this->sendMessageToChat($this->responseText);
     }
@@ -24,9 +21,11 @@ class WerewolfBot extends Bot {
         else if ($this->messageText === '/newgame') {
             //check if a game is already running
             if (doesChatIdExist($this->connection, $this->chatId)) {
-                return $this->responseText = 'A game is already running!';
+                http_response_code(200);
+                exit('A game is already running');
             }
             addChat($this->connection, $this->chatId);
+            addToGame($this->connection, $this->chatId, $this->telegramId, $this->firstName);
             return $this->beginGameSequence();
         }
         else if ($this->messageText === '/join') {
@@ -43,7 +42,18 @@ class WerewolfBot extends Bot {
             return $this->responseText = 'Forcefully ended the game!';
         }
     }
+    private function makePlayerList(): string {
+        $players = getTelegramNamesFromChat($this->connection, $this->chatId);
+        $string = '*Player list (Total: '.count($players).')*'.chr(10);
+        foreach($players as $player) {
+            $string .= '`'.$player.'`'.chr(10);
+        }
+        return $string;
+    }
     private function beginGameSequence() {
+        $this->sendMessageToChat('A werewolf game has started!');
+        $playerListMessage = json_decode($this->sendMarkdownMessage($this->makePlayerList()), true);
+        $playerListMessage = intval($playerListMessage['result']['message_id']);
         //wait for joiners
         $i = 0;
         $limit = 2;
@@ -53,10 +63,11 @@ class WerewolfBot extends Bot {
             }
             $timeLeft = ($limit - $i) * 30;
             $this->sendMessageToChat($timeLeft.' seconds left to join!');
+            $this->editMessage($playerListMessage, $this->makePlayerList());
             $i++;
             sleep(30);
         }
-        $this->sendMessageToChat('The game has started! Please wait while the roles are assigned!');
+        $this->sendMessageToChat('Joining period ended! Please wait while the roles are assigned!');
         $players = getTelegramIdsFromChat($this->connection, $this->chatId);
         //shuffle players
         shuffle($players);
