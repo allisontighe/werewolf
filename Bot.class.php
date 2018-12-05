@@ -25,6 +25,7 @@ class Bot {
         return $response;
     }
     protected function sendEcho(string $message) {
+        header('Content-Type: application/json');
         http_response_code(200);
         echo json_encode(['method' => 'sendMessage', 'chat_id' => $this->chatId, 'text' => $message]);
         ob_flush();
