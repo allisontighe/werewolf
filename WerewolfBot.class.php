@@ -55,6 +55,7 @@ class WerewolfBot extends Bot {
         $playerListMessage = json_decode($this->sendMarkdownMessage($this->makePlayerList()), true);
         $playerListMessage = intval($playerListMessage['result']['message_id']);
         updateMessageId($this->connection, $this->chatId, $playerListMessage);
+        $this->sendMessageToChat(json_encode($playerListMessage));
         //wait for joiners
         $i = 0;
         $limit = 2;
