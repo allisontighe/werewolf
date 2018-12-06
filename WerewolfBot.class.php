@@ -10,7 +10,7 @@ class WerewolfBot extends Bot {
     }
     public function process() {
         if ($this->messageText === '/hi') {
-            $this->sendEcho('Bye!');
+            $this->sendMessageToChat('Bye!');
         }
         else if ($this->messageText === '/newgame') {
             //check if a game is already running
