@@ -33,7 +33,7 @@ class Bot {
         $this->send('sendMessage', ['chat_id' => $this->chatId, 'text' => $message]);
     }
     protected function sendMarkdownMessage(string $message) {
-        $this->send('sendMessage', ['chat_id' => $this->chatId, 'text' => $message, 'parse_mode' => 'Markdown']);
+        return $this->send('sendMessage', ['chat_id' => $this->chatId, 'text' => $message, 'parse_mode' => 'Markdown']);
     }
     protected function sendMessageToPlayer(string $message, int $playerId) {
         $this->send('sendMessage', ['chat_id' => $playerId, 'text' => $message]);
