@@ -2,8 +2,11 @@
 require_once 'Bot.class.php';
 require_once 'Connection.class.php';
 require_once 'functions.php';
+require_once 'constants.php';
+require_once 'Role.class.php';
 class WerewolfBot extends Bot {
     private $connection;
+    private $roles = [];
     public function __construct(array $message) {
         $this->connection = new Connection;
         parent::__construct($message);
@@ -18,6 +21,7 @@ class WerewolfBot extends Bot {
                 http_response_code(200);
                 exit('A game is already running!');
             }
+            $this->loadRoles();
             $this->beginGameSequence();
         }
         else if ($this->messageText === '/join') {
@@ -48,6 +52,25 @@ class WerewolfBot extends Bot {
         }
         return $string;
     }
+    private function loadRoles() {
+        //always retain the numerical order!
+        $this->roles[] = new Role(0, 'Villager', false, taskTypes::none, 'The village plower.');
+        $this->roles[] = new Role(1, 'Werewolf', true, taskTypes::night, 'The everyday baddie.');
+        $this->roles[] = new Role(2, 'Clown', false, taskTypes::none, 'Silver add something here :P');
+    }
+    private function divideRoles(): array {
+        //divide into good or evil
+        $dividedRoles = ['good' => [], 'evil' => []];
+        foreach($this->roles as $role) {
+            if ($role->getEvil()) {
+                $dividedRoles['evil'][] = $role; //evil role
+            }
+            else {
+                $dividedRoles['good'][] = $role; //good role
+            }
+        }
+        return $dividedRoles;
+    }
     private function beginGameSequence() {
         addChat($this->connection, $this->chatId);
         addToGame($this->connection, $this->chatId, $this->telegramId, $this->firstName);
@@ -72,31 +95,47 @@ class WerewolfBot extends Bot {
             http_response_code(200);
             exit('Chat id no longer exists'); //chat id no longer exists!!
         }
-        $this->sendMessageToChat('Joining period ended! Please wait while the roles are assigned!');
+        //check if enough players joined
         $players = getTelegramIdsFromChat($this->connection, $this->chatId);
+        if (count($players) < 5 && false) {//disable for now
+            return $this->sendMessageToChat('Joining period ended! Not enough players present to start the game!');
+        }
+        
+        $this->sendMessageToChat('Joining period ended! Please wait while the roles are assigned!');
         //shuffle players
         shuffle($players);
-        $goodRoles = getGoodRoles($this->connection);
-        $evilRoles = getEvilRoles($this->connection);
+        $roles = $this->divideRoles();
         $totalPlayers = count($players);
         $baddies = ceil($totalPlayers / 5);
         $assignedBaddies = 0;
         foreach($players as $player) {
             if ($assignedBaddies < $baddies) {
                 //set random evil role
-                $role = $evilRoles[array_rand($evilRoles)];
-                setRole($this->connection, $this->chatId, $player, $role['id']);
+                $role = $roles['evil'][array_rand($roles['evil'])];
+                setRole($this->connection, $this->chatId, $player, $role->id);
                 $assignedBaddies++;
             }
             else {
                 //set a good role
-                $role = $goodRoles[array_rand($goodRoles)];
-                setRole($this->connection, $this->chatId, $player, $role['id']);
+                $role = $roles['good'][array_rand($roles['good'])];
+                setRole($this->connection, $this->chatId, $player, $role->id);
             }
             //message player
-            $this->sendMessageToPlayer('You are a '.$role['name'].chr(10).$role['description'], $player);
+            $this->sendMessageToPlayer('You are a '.$role->name.chr(10).$role->description, $player);
         }
+        /* This isnt ready yet!!
+        while($assignedBaddies > 0) {//run game till all assigned baddies die
+            $this->runNight();
+        }*/
         return $this->endGame();
+    }
+    private function runNight() {
+        $players = getPlayerData($this->connection, $this->chatId);
+        foreach($players as $player) {
+            if($this->roles[$player['role']]->getTaskType() === taskTypes::night) {
+                //do task depending on role
+            }
+        }
     }
     private function endGame() {
         $this->sendMessageToChat('The game has ended!');
