@@ -39,6 +39,6 @@ class Bot {
         $this->send('sendMessage', ['chat_id' => $playerId, 'text' => $message]);
     }
     protected function editMessage(int $messageId, string $message) {
-        $this->send('editMessageText', ['chat_id' => $this->chatId, 'message_id' => $messageId, 'text' => $message]);
+        $this->send('editMessageText', ['chat_id' => $this->chatId, 'message_id' => $messageId, 'text' => $message, 'parse_mode' => 'Markdown']);
     }
 }
