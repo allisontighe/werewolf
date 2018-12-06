@@ -53,7 +53,6 @@ class WerewolfBot extends Bot {
         addToGame($this->connection, $this->chatId, $this->telegramId, $this->firstName);
         $this->sendMessageToChat('A werewolf game is starting!');
         $playerListMessage = json_decode($this->sendMarkdownMessage($this->makePlayerList()), true);
-        $this->sendMessageToChat(json_encode($playerListMessage));
         $playerListMessage = intval($playerListMessage['result']['message_id']);
         updateMessageId($this->connection, $this->chatId, $playerListMessage);
         //wait for joiners
