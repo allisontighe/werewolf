@@ -18,8 +18,17 @@ function addToGame(Connection $connection, int $chatId, int $telegramId, string 
     $PDOStatement->execute([$chatId, $telegramId, $name]);
 }
 function addChat(Connection $connection, int $chatId) {
-    $PDOStatement = $connection->prepare('INSERT INTO chats (chat_id, status) VALUES (?, 0)');
+    $PDOStatement = $connection->prepare('INSERT INTO chats (chat_id, status, message_id) VALUES (?, 0, 0)');
     $PDOStatement->execute([$chatId]);
+}
+function updateMessageId(Connection $connection, int $chatId, int $messageId) {
+    $PDOStatement = $connection->prepare('UPDATE chats SET status = 1, message_id = ? WHERE chat_id = ?');
+    $PDOStatement->execute([$messageId, $chatId]);
+}
+function getMessageId(Connection $connection, int $chatId) {
+    $PDOStatement = $connection->prepare('SELECT message_id FROM chats WHERE chat_id = ?');
+    $PDOStatement->execute([$chatId]);
+    return (int)$PDOStatement->fetchColumn();
 }
 function getTelegramIdsFromChat(Connection $connection, int $chatId): array {
     $PDOStatement = $connection->prepare('SELECT telegram_id FROM players WHERE chat_id = ?');

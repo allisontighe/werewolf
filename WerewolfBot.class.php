@@ -4,43 +4,40 @@ require_once 'Connection.class.php';
 require_once 'functions.php';
 class WerewolfBot extends Bot {
     private $connection;
-    private $responseText;
     public function __construct(array $message) {
         $this->connection = new Connection;
         parent::__construct($message);
     }
     public function process() {
-        $this->readCommand();
-        if (!empty($this->responseText)) $this->sendMessageToChat($this->responseText);
-    }
-    private function readCommand() {
-        
         if ($this->messageText === '/hi') {
-            $this->responseText = 'Bye!';
+            $this->sendEcho('Bye!');
         }
         else if ($this->messageText === '/newgame') {
-            return $this->responseText = 'I dont wanna play wid u';
             //check if a game is already running
-            if (doesChatIdExist($this->connection, $this->chatId)) {//echo to clear output buffer
-                return $this->sendEcho('A game has already started!');
+            if (doesChatIdExist($this->connection, $this->chatId)) {
+                http_response_code(200);
+                exit('A game is already running!');
             }
-            addChat($this->connection, $this->chatId);
-            addToGame($this->connection, $this->chatId, $this->telegramId, $this->firstName);
-            $this->sendEcho('A werewolf game is starting!'); //echo to clear output buffer
-            return $this->beginGameSequence();
+            $this->beginGameSequence();
         }
         else if ($this->messageText === '/join') {
             //check if already joined
             if (doesTelegramIdExist($this->connection, $this->chatId, $this->telegramId)) {
-                return $this->responseText = 'You have already joined the game!';
+                $this->sendEcho('You have already joined the game!');
             }
-            addToGame($this->connection, $this->chatId, $this->telegramId, $this->firstName);
-            return $this->responseText = 'Added '.$this->firstName.' to the game!';
+            else {
+                addToGame($this->connection, $this->chatId, $this->telegramId, $this->firstName);
+                $playerListMessageId = getMessageId($this->connection, $this->chatId);
+                if ($playerListMessageId !== 0) {
+                    $this->editMessage($playerListMessageId, $this->makePlayerList());
+                }
+                $this->sendEcho('Added '.$this->firstName.' to the game!');
+            }
         }
         else if ($this->messageText === '/endgame') {
             //end game
             deleteChatId($this->connection, $this->chatId);
-            return $this->responseText = 'Forcefully ended the game!';
+            $this->sendEcho('Forcefully ended the game!');
         }
     }
     private function makePlayerList(): string {
@@ -52,8 +49,12 @@ class WerewolfBot extends Bot {
         return $string;
     }
     private function beginGameSequence() {
+        addChat($this->connection, $this->chatId);
+        addToGame($this->connection, $this->chatId, $this->telegramId, $this->firstName);
+        $this->sendMessageToChat('A werewolf game is starting!');
         $playerListMessage = json_decode($this->sendMarkdownMessage($this->makePlayerList()), true);
         $playerListMessage = intval($playerListMessage['result']['message_id']);
+        updateMessageId($this->connection, $this->chatId, $playerListMessage);
         //wait for joiners
         $i = 0;
         $limit = 2;
@@ -64,7 +65,6 @@ class WerewolfBot extends Bot {
             }
             $timeLeft = ($limit - $i) * 30;
             $this->sendMessageToChat($timeLeft.' seconds left to join!');
-            $this->editMessage($playerListMessage, $this->makePlayerList());
             $i++;
             sleep(30);
         }//check again before continuing

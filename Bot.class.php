@@ -28,8 +28,6 @@ class Bot {
         header('Content-Type: application/json');
         http_response_code(200);
         echo json_encode(['method' => 'sendMessage', 'chat_id' => $this->chatId, 'text' => $message]);
-        //this is for the buffer achieve the minimum size in order to flush data
-        echo str_repeat(' ',1024*64);
     }
     protected function sendMessageToChat(string $message) {
         $this->send('sendMessage', ['chat_id' => $this->chatId, 'text' => $message]);
