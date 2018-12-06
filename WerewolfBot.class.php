@@ -112,16 +112,16 @@ class WerewolfBot extends Bot {
             if ($assignedBaddies < $baddies) {
                 //set random evil role
                 $role = $roles['evil'][array_rand($roles['evil'])];
-                setRole($this->connection, $this->chatId, $player, $role->id);
+                setRole($this->connection, $this->chatId, $player, $role->getId());
                 $assignedBaddies++;
             }
             else {
                 //set a good role
                 $role = $roles['good'][array_rand($roles['good'])];
-                setRole($this->connection, $this->chatId, $player, $role->id);
+                setRole($this->connection, $this->chatId, $player, $role->getId());
             }
             //message player
-            $this->sendMessageToPlayer('You are a '.$role->name.chr(10).$role->description, $player);
+            $this->sendMessageToPlayer('You are a '.$role->getName().chr(10).$role->getDescription(), $player);
         }
         /* This isnt ready yet!!
         while($assignedBaddies > 0) {//run game till all assigned baddies die
