@@ -38,11 +38,6 @@ class WerewolfBot extends Bot {
                 $this->sendEcho('Added '.$this->firstName.' to the game!');
             }
         }
-        else if ($this->messageText === '/endgame') {
-            //end game
-            deleteChatId($this->connection, $this->chatId);
-            $this->sendEcho('Forcefully ended the game!');
-        }
     }
     private function makePlayerList(): string {
         $players = getTelegramNamesFromChat($this->connection, $this->chatId);
@@ -82,18 +77,10 @@ class WerewolfBot extends Bot {
         $i = 0;
         $limit = 2;
         while ($i < $limit) {
-            if (!doesChatIdExist($this->connection, $this->chatId)) {
-                http_response_code(200);
-                exit('Chat id no longer exists'); //chat id no longer exists!!
-            }
             $timeLeft = ($limit - $i) * 30;
             $this->sendMessageToChat($timeLeft.' seconds left to join!');
             $i++;
             sleep(30);
-        }//check again before continuing
-        if (!doesChatIdExist($this->connection, $this->chatId)) {
-            http_response_code(200);
-            exit('Chat id no longer exists'); //chat id no longer exists!!
         }
         //check if enough players joined
         $players = getTelegramIdsFromChat($this->connection, $this->chatId);
