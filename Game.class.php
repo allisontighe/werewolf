@@ -50,7 +50,7 @@ class Game {
         $this->endGame();
     }
     private function waitForJoiners() {
-        $limit = getWaitInterval($this->chatId);
+        $limit = getWaitInterval($this->connection, $this->chatId);
         $keyboard = [[['text' => 'Join', 'url' => 'https://t.me/'.BotInfo::username.'?start='.$this->chatId]]];
         for ($i = 0; $i < $limit; $i++) {
             $timeLeft = ($limit - $i) * 30;
