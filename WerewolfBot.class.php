@@ -34,8 +34,12 @@ class WerewolfBot extends Bot {
             $this->loadRoles();
             $this->beginGameSequence();
         }
-        else if ($command === '/eat') {
-            
+        else if ($command === '/eat' && $parameter !== false) {
+            if (doesTelegramIdExist($this->connection, $parameter) && !isDead($this->connection, $parameter)) {
+                takeActionOn($this->connection, $this->telegramId, $parameter);
+                $this->editMessage($this->chatId, $this->messageId, 'Target chosen!');
+            }
+            else $this->sendMessageToChat('Invalid target!');
         }
         else if ($command === '/start' && $parameter !== false) {
             $chatId = $parameter;
@@ -77,7 +81,7 @@ class WerewolfBot extends Bot {
         }
         //check if enough players joined
         $players = getTelegramIdsFromChat($this->connection, $this->chatId);
-        if (count($players) < 5) {
+        if (count($players) < 2) {
             //delete chat
             deleteChatId($this->connection, $this->chatId);
             return $this->sendMessageToChat('Joining period ended! Not enough players present to start the game!');
@@ -128,10 +132,24 @@ class WerewolfBot extends Bot {
     }
     private function runNight() {
         $players = getPlayerData($this->connection, $this->chatId);
+        $someoneDied = false;
         foreach($players as $player) {
             if($this->roles[$player['role']]->getTaskType() === taskTypes::night) {
                 //do task depending on role
+                if ($player['role'] === RoleId::werewolf) {
+                    $targetId = takenActionOn($this->connection, $player['telegram_id']);
+                    if ($targetId !== 0) {
+                        //kill target
+                        $someoneDied = true;
+                        killPlayer($this->connection, $targetId);
+                        $this->sendMessageToChat(getPlayerName($this->connection, $targetId).' was eaten by the wolf!');
+                        $this->sendMessageToPlayer('NOM NOM you were eaten!', $targetId);
+                    }
+                }
             }
+        }
+        if (!$someoneDied) {
+            $this->sendMessageToChat('The night ended without anyone taking any action');
         }
     }
     private function endGame() {

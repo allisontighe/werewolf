@@ -45,9 +45,40 @@ function getTelegramNamesFromChat(Connection $connection, int $chatId): array {
     return $PDOStatement->fetchAll(PDO::FETCH_COLUMN);
 }
 function getPlayerData(Connection $connection, int $chatId): array {
-    $PDOStatement = $connection->prepare('SELECT name, role, took_action_on, telegram_id FROM players WHERE chat_id = ?');
+    $PDOStatement = $connection->prepare('SELECT name, role, took_action_on, telegram_id FROM players WHERE chat_id = ? AND dead = false');
     $PDOStatement->execute([$chatId]);
     return $PDOStatement->fetchAll(PDO::FETCH_ASSOC);
+}
+function isDead(Connection $connection, int $telegramId): bool {
+    $PDOStatement = $connection->prepare('SELECT dead FROM players WHERE telegram_id = ?');
+    $PDOStatement->execute([$telegramId]);
+    return boolval($PDOStatement->fetchColumn());
+}
+function takeActionOn(Connection $connection, int $telegramId, int $targetId): void {
+    $PDOStatement = $connection->prepare('UPDATE players SET took_action_on = ? WHERE telegram_id = ?');
+    $PDOStatement->execute([$targetId, $telegramId]);
+}
+function takenActionOn(Connection $connection, int $telegramId): int {
+    $PDOStatement = $connection->prepare('SELECT took_action_on FROM players WHERE telegram_id = ?');
+    $PDOStatement->execute([$telegramId]);
+    return intval($PDOStatement->fetchColumn());
+}
+function getPlayerName(Connection $connection, int $telegramId): string {
+    $PDOStatement = $connection->prepare('SELECT name FROM players WHERE telegram_id = ?');
+    $PDOStatement->execute([$telegramId]);
+    return $PDOStatement->fetchColumn();
+}
+function killPlayer(Connection $connection, int $telegramId): void {
+    $PDOStatement = $connection->prepare('UPDATE players SET dead = true WHERE telegram_id = ?');
+    $PDOStatement->execute([$telegramId]);
+}
+function makePlayerList(Connection $connection, int $chatId): string {
+    $players = getTelegramNamesFromChat($connection, $chatId);
+    $string = '*Player list (Total: '.count($players).')*'.chr(10);
+    foreach($players as $player) {
+        $string .= '`'.$player.'`'.chr(10);
+    }
+    return $string;
 }
 function generateKeyboard(array $player, array $allPlayers, string $command): array {//generates keyboard with other players
     $keyboard = [];
@@ -70,14 +101,6 @@ function divideRoles(array $roles): array {
         }
     }
     return $dividedRoles;
-}
-function makePlayerList(Connection $connection, int $chatId): string {
-    $players = getTelegramNamesFromChat($connection, $chatId);
-    $string = '*Player list (Total: '.count($players).')*'.chr(10);
-    foreach($players as $player) {
-        $string .= '`'.$player.'`'.chr(10);
-    }
-    return $string;
 }
 function parseMessageText(string $messageText): array {
     $array = ['command' => '', 'parameter' => ''];
