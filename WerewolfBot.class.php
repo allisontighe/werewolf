@@ -51,7 +51,7 @@ class WerewolfBot extends Bot {
         //always retain the numerical order!
         $this->roles[] = new Role(0, 'Villager', false, taskTypes::none, 'The village plower.');
         $this->roles[] = new Role(1, 'Werewolf', true, taskTypes::night, 'The everyday baddie.');
-        $this->roles[] = new Role(2, 'Clown', false, taskTypes::none, 'Silver add something here :P');
+        $this->roles[] = new Role(2, 'Clown', false, taskTypes::none, 'You are the Village clown, you play pranks on the villagers at night and though you are good, you are sometimes mistaken for bad');
     }
     private function divideRoles(): array {
         //divide into good or evil
