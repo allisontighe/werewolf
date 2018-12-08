@@ -37,7 +37,7 @@ class WerewolfBot extends Bot {
                     addToGame($this->connection, $chatId, $this->telegramId, $this->firstName);
                     $playerListMessageId = getMessageId($this->connection, $chatId);
                     if ($playerListMessageId !== 0) {
-                        $this->editMessage($chatId, $playerListMessageId, $this->makePlayerList());
+                        $this->editMessage($chatId, $playerListMessageId, $this->makePlayerList($chatId));
                     }
                     $this->sendEcho('You have been added to the game!');
                 }
@@ -47,8 +47,8 @@ class WerewolfBot extends Bot {
             }
         }
     }
-    private function makePlayerList(): string {
-        $players = getTelegramNamesFromChat($this->connection, $this->chatId);
+    private function makePlayerList(int $chatId): string {
+        $players = getTelegramNamesFromChat($this->connection, $chatId);
         $string = '*Player list (Total: '.count($players).')*'.chr(10);
         foreach($players as $player) {
             $string .= '`'.$player.'`'.chr(10);
@@ -77,7 +77,7 @@ class WerewolfBot extends Bot {
         addChat($this->connection, $this->chatId);
         addToGame($this->connection, $this->chatId, $this->telegramId, $this->firstName);
         $this->sendMessageToChat('A werewolf game is starting!');
-        $playerListMessage = json_decode($this->sendMessageToChat($this->makePlayerList()), true);
+        $playerListMessage = json_decode($this->sendMessageToChat($this->makePlayerList($this->chatId)), true);
         $playerListMessage = intval($playerListMessage['result']['message_id']);
         updateMessageId($this->connection, $this->chatId, $playerListMessage);
         //wait for joiners
