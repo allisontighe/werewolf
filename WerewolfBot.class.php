@@ -37,7 +37,7 @@ class WerewolfBot extends Bot {
                     addToGame($this->connection, $chatId, $this->telegramId, $this->firstName);
                     $playerListMessageId = getMessageId($this->connection, $chatId);
                     if ($playerListMessageId !== 0) {
-                        $this->editMessage($playerListMessageId, $this->makePlayerList());
+                        $this->editMessage($chatId, $playerListMessageId, $this->makePlayerList());
                     }
                     $this->sendEcho('You have been added to the game!');
                 }

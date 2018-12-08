@@ -39,7 +39,7 @@ class Bot {
         if (empty($keyboard)) $this->send('sendMessage', ['chat_id' => $playerId, 'text' => $message, 'parse_mode' => 'Markdown']);
         else $this->send('sendMessage', ['chat_id' => $playerId, 'text' => $message, 'parse_mode' => 'Markdown', 'reply_markup' => json_encode(['inline_keyboard' => $keyboard])]);
     }
-    protected function editMessage(int $messageId, string $message) {
-        $this->send('editMessageText', ['chat_id' => $this->chatId, 'message_id' => $messageId, 'text' => $message, 'parse_mode' => 'Markdown']);
+    protected function editMessage(int $chatId, int $messageId, string $message) {
+        $this->send('editMessageText', ['chat_id' => $chatId, 'message_id' => $messageId, 'text' => $message, 'parse_mode' => 'Markdown']);
     }
 }
