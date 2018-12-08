@@ -1,6 +1,8 @@
 <?php
 require_once 'Connection.class.php';
 require_once 'Game.class.php';
+ignore_user_abort(true);
+set_time_limit(100);
 
 $connection = new Connection;
 $PDOStatement = $connection->prepare('SELECT chat_id FROM chats WHERE status = 0');
