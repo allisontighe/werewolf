@@ -8,9 +8,11 @@ class Game {
     private $chatId;
     private $roles = [];
     private $baddies = 0;
+    private $taskTime;
     public function __construct(Connection $connection, int $chatId) {
         $this->connection = $connection;
         $this->chatId = $chatId;
+        $this->taskTime = taskTypes::night;
         $this->loadRoles();
         $this->process();
     }
@@ -40,14 +42,62 @@ class Game {
         $this->sendMessage($this->chatId, 'Joining period ended! Please wait while the roles are assigned!');
         //run game till all assigned baddies die
         while($this->baddies > 0) {
-            $this->prepareNight();
+            $this->prepare();
+            $this->run();
+            $this->updateTime();
             sleep(60);
-            $this->runNight();
-            $this->prepareDay();
-            sleep(60);
-            $this->runDay();
         }
         $this->endGame();
+    }
+    private function prepare() {
+        $players = getPlayerData($this->connection, $this->chatId);
+        if ($this->taskTime === taskTypes::night) {
+            $this->sendMessage($this->chatId, 'Night has started! Players have 60 seconds to conduct their actions!');
+        }
+        else if ($this->taskTime === taskTypes::day) {
+            $this->sendMessage($this->chatId, 'The day has started! Players have 60 seconds to decide who the culprit is!');
+        }
+        foreach($players as $player) {
+            if($this->roles[$player['role']]->getTaskType() === $this->taskTime) {
+                if ($player['role'] === RoleId::werewolf) {
+                    $this->sendMessage($player['telegram_id'], 'Who do you want to eat tonight?', generateKeyboard($player, $players, 'eat'));
+                }
+                else if ($player['role'] === RoleId::clown) {
+                    $this->sendMessage($player['telegram_id'], 'Who do you want to prank tonight', generateKeyboard($player, $players, 'prank'));
+                }
+            }
+            if ($this->taskTime === taskTypes::day) {
+                //lynch options
+                $this->sendMessage($player['telegram_id'], 'Who do you want to lynch?', generateKeyboard($player, $players, 'lynch'));
+            }
+        }
+    }
+    private function run() {
+        $players = getPlayerData($this->connection, $this->chatId);
+        foreach($players as $player) {
+            if($this->roles[$player['role']]->getTaskType() === $this->taskTime) {
+                //do task depending on role
+                if ($player['role'] === RoleId::werewolf) {
+                    $targetId = $player['took_action_on'];
+                    if ($targetId !== 0) {
+                        //kill target
+                        killPlayer($this->connection, $targetId);
+                        $this->sendMessage($this->chatId, getPlayerName($this->connection, $targetId).' was eaten by the wolf!');
+                        $this->sendMessage($targetId, 'NOM NOM you were eaten!');
+                    }
+                }
+            }
+            if ($this->taskTime === taskTypes::day) {
+                //do lynch stuff
+                $this->baddies--; //forcefully decrease now
+            }
+        }
+    }
+    private function updateTime() {
+        //update task time
+        if ($this->taskTime === taskTypes::night) $this->taskTime = taskTypes::day;
+        else if ($this->taskTime === taskTypes::day) $this->taskTime = taskTypes::evening;
+        else if ($this->taskTime === taskTypes::evening) $this->taskTime = taskTypes::night;
     }
     private function waitForJoiners() {
         $limit = getWaitInterval($this->connection, $this->chatId);
@@ -78,56 +128,6 @@ class Game {
             }
             //message player
             $this->sendMessage($player, $role->getDescription());
-        }
-    }
-    private function prepareDay() {
-        $this->sendMessage($this->chatId, 'The day has started! Players have 60 seconds to decide who the culprit is!');
-        $players = getPlayerData($this->connection, $this->chatId);
-        foreach($players as $player) {
-            $this->sendMessage($player['telegram_id'], 'Who do you want to lynch?', generateKeyboard($player, $players, 'lynch'));
-        }
-    }
-    private function runDay() {
-        $players = getPlayerData($this->connection, $this->chatId);
-        $this->baddies--; //forcefully decrease now
-        foreach($players as $player) {
-            //lynch
-        }
-    }
-    private function prepareNight() {
-        $this->sendMessage($this->chatId, 'Night has started! Players have 60 seconds to conduct their actions!');
-        $players = getPlayerData($this->connection, $this->chatId);
-        foreach($players as $player) {
-            if($this->roles[$player['role']]->getTaskType() === taskTypes::night) {
-                if ($player['role'] === RoleId::werewolf) {
-                    $this->sendMessage($player['telegram_id'], 'Who do you want to eat tonight?', generateKeyboard($player, $players, 'eat'));
-                }
-                else if ($player['role'] === RoleId::clown) {
-                    $this->sendMessage($player['telegram_id'], 'Who do you want to prank tonight', generateKeyboard($player, $players, 'prank'));
-                }
-            }
-        }
-    }
-    private function runNight() {
-        $players = getPlayerData($this->connection, $this->chatId);
-        $someoneDied = false;
-        foreach($players as $player) {
-            if($this->roles[$player['role']]->getTaskType() === taskTypes::night) {
-                //do task depending on role
-                if ($player['role'] === RoleId::werewolf) {
-                    $targetId = $player['took_action_on'];
-                    if ($targetId !== 0) {
-                        //kill target
-                        $someoneDied = true;
-                        killPlayer($this->connection, $targetId);
-                        $this->sendMessage($this->chatId, getPlayerName($this->connection, $targetId).' was eaten by the wolf!');
-                        $this->sendMessage($targetId, 'NOM NOM you were eaten!');
-                    }
-                }
-            }
-        }
-        if (!$someoneDied) {
-            $this->sendMessage($this->chatId, 'The night ended without anyone taking any action');
         }
     }
     private function endGame() {
