@@ -22,7 +22,7 @@ class Game {
     }
     private function process(): void {
         //update chat status
-        setStatus($this->connection, $this->chatId, 2);
+        setStatus($this->connection, $this->chatId, 1);
         //make player list
         $playerListMessage = json_decode($this->sendMessage($this->chatId, makePlayerList($this->connection, $this->chatId)), true);
         updateMessageId($this->connection, $this->chatId, intval($playerListMessage['result']['message_id']));
