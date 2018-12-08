@@ -93,6 +93,8 @@ class WerewolfBot extends Bot {
         //check if enough players joined
         $players = getTelegramIdsFromChat($this->connection, $this->chatId);
         if (count($players) < 5) {
+            //delete chat
+            deleteChatId($this->connection, $this->chatId);
             return $this->sendMessageToChat('Joining period ended! Not enough players present to start the game!');
         }
         
