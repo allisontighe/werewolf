@@ -24,7 +24,7 @@ class WerewolfBot extends Bot {
             $this->loadRoles();
             $this->beginGameSequence();
         }
-        else if (strpos($this->messageText, '/start ') !== false) {//check if it exists in string
+        else if (strpos($this->messageText, '/start ') === 0) {//check if it exists in string
             //parse request
             $spaceIndex = strpos($this->messageText, ' ');
             $chatId = trim(substr($this->messageText, $spaceIndex));
