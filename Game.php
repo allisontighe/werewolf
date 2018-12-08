@@ -5,7 +5,7 @@ ignore_user_abort(true);
 set_time_limit(100);
 
 $connection = new Connection;
-$PDOStatement = $connection->prepare('SELECT chat_id FROM chats WHERE status = 0');
+$PDOStatement = $connection->query('SELECT chat_id FROM chats WHERE status = 0');
 if ($PDOStatement->rowCount() === 0) exit('No data!');
 else {
     //start new game
