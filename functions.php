@@ -4,28 +4,28 @@ function doesChatIdExist(Connection $connection, int $chatId): bool {
     $PDOStatement->execute([$chatId]);
     return boolval($PDOStatement->fetchColumn());
 }
-function doesTelegramIdExist(Connection $connection, int $chatId, int $telegramId): bool {
-    $PDOStatement = $connection->prepare('SELECT COUNT(telegram_id) FROM players WHERE chat_id = ? AND telegram_id = ?');
-    $PDOStatement->execute([$chatId, $telegramId]);
+function doesTelegramIdExist(Connection $connection, int $telegramId): bool {
+    $PDOStatement = $connection->prepare('SELECT COUNT(telegram_id) FROM players WHERE telegram_id = ?');
+    $PDOStatement->execute([$telegramId]);
     return boolval($PDOStatement->fetchColumn());
 }
-function deleteChatId(Connection $connection, int $chatId) {
+function deleteChatId(Connection $connection, int $chatId): void {
     $PDOStatement = $connection->prepare('DELETE FROM chats WHERE chat_id = ?');
     $PDOStatement->execute([$chatId]);
 }
-function addToGame(Connection $connection, int $chatId, int $telegramId, string $name) {
+function addToGame(Connection $connection, int $chatId, int $telegramId, string $name): void {
     $PDOStatement = $connection->prepare('INSERT INTO players (chat_id, telegram_id, name, role) VALUES (?, ?, ?, 0)');
     $PDOStatement->execute([$chatId, $telegramId, $name]);
 }
-function addChat(Connection $connection, int $chatId) {
+function addChat(Connection $connection, int $chatId): void {
     $PDOStatement = $connection->prepare('INSERT INTO chats (chat_id, status, message_id) VALUES (?, 0, 0)');
     $PDOStatement->execute([$chatId]);
 }
-function updateMessageId(Connection $connection, int $chatId, int $messageId) {
+function updateMessageId(Connection $connection, int $chatId, int $messageId): void {
     $PDOStatement = $connection->prepare('UPDATE chats SET status = 1, message_id = ? WHERE chat_id = ?');
     $PDOStatement->execute([$messageId, $chatId]);
 }
-function getMessageId(Connection $connection, int $chatId) {
+function getMessageId(Connection $connection, int $chatId): int {
     $PDOStatement = $connection->prepare('SELECT message_id FROM chats WHERE chat_id = ?');
     $PDOStatement->execute([$chatId]);
     return (int)$PDOStatement->fetchColumn();
@@ -35,7 +35,7 @@ function getTelegramIdsFromChat(Connection $connection, int $chatId): array {
     $PDOStatement->execute([$chatId]);
     return $PDOStatement->fetchAll(PDO::FETCH_COLUMN);
 }
-function setRole(Connection $connection, int $chatId, int $telegramId, int $role) {
+function setRole(Connection $connection, int $chatId, int $telegramId, int $role): void {
     $PDOStatement = $connection->prepare('UPDATE players SET role = ? WHERE chat_id = ? AND telegram_id = ?');
     $PDOStatement->execute([$role, $chatId, $telegramId]);
 }
@@ -48,4 +48,48 @@ function getPlayerData(Connection $connection, int $chatId): array {
     $PDOStatement = $connection->prepare('SELECT name, role, took_action_on, telegram_id FROM players WHERE chat_id = ?');
     $PDOStatement->execute([$chatId]);
     return $PDOStatement->fetchAll(PDO::FETCH_ASSOC);
+}
+function generateKeyboard(array $player, array $allPlayers, string $command): array {//generates keyboard with other players
+    $keyboard = [];
+    foreach($allPlayers as $otherPlayer) {
+        if ($otherPlayer['telegram_id'] !== $player['telegram_id']) {
+            $keyboard[] = [['text' => $otherPlayer['name'], 'callback_data' => '/'.$command.' '.$otherPlayer['telegram_id']]];
+        }
+    }
+    return $keyboard;
+}
+function divideRoles(array $roles): array {
+    //divide into good or evil
+    $dividedRoles = ['good' => [], 'evil' => []];
+    foreach($roles as $role) {
+        if ($role->getEvil()) {
+            $dividedRoles['evil'][] = $role; //evil role
+        }
+        else {
+            $dividedRoles['good'][] = $role; //good role
+        }
+    }
+    return $dividedRoles;
+}
+function makePlayerList(Connection $connection, int $chatId): string {
+    $players = getTelegramNamesFromChat($connection, $chatId);
+    $string = '*Player list (Total: '.count($players).')*'.chr(10);
+    foreach($players as $player) {
+        $string .= '`'.$player.'`'.chr(10);
+    }
+    return $string;
+}
+function parseMessageText(string $messageText): array {
+    $array = ['command' => '', 'parameter' => ''];
+    $spaceIndex = strpos($messageText, ' ');
+    if ($spaceIndex !== false) {
+        $array['parameter'] = substr($messageText, $spaceIndex);
+        $array['command'] = str_replace($array['parameter'], '', $messageText);
+        $array['parameter'] = trim($array['parameter']);
+    }
+    else {
+        $array['command'] = $messageText;
+        $array['parameter'] = false;
+    }
+    return $array;
 }

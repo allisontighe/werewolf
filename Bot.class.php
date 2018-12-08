@@ -1,5 +1,6 @@
 <?php
 require_once 'constants.php';
+require_once 'functions.php';
 class Bot {
     protected $chatId;
     protected $telegramId;
@@ -11,7 +12,7 @@ class Bot {
         $this->chatId = $request['message']['chat']['id'] ?? $request['callback_query']['message']['chat']['id'] ?? exit('Chat id not set');
         $this->telegramId = $request['message']['from']['id'] ?? $request['callback_query']['from']['id'] ?? exit('Telegram id not set');
         $this->messageId = $request['message']['message_id'] ?? $request['callback_query']['message']['message_id'] ?? exit('Message id not set');
-        $this->messageText = $request['message']['text'] ?? '';
+        $this->messageText = $request['message']['text'] ?? $request['callback_query']['data'] ?? exit('Message text is not set');
         $this->firstName = $request['message']['from']['first_name'] ?? $request['callback_query']['from']['first_name'] ?? '';
         $this->queryId = $request['callback_query']['id'] ?? 0;
     }
