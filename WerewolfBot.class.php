@@ -7,6 +7,7 @@ require_once 'Role.class.php';
 class WerewolfBot extends Bot {
     private $connection;
     private $roles = [];
+    private $baddies = 0;
     private function loadRoles() {
         $this->roles[RoleId::villager] = new Role(RoleId::villager, 'Villager', false, taskTypes::none, 'The village plower.');
         $this->roles[RoleId::werewolf] = new Role(RoleId::werewolf, 'Werewolf', true, taskTypes::night, 'The everyday baddie.');
@@ -38,6 +39,17 @@ class WerewolfBot extends Bot {
             if (doesTelegramIdExist($this->connection, $parameter) && !isDead($this->connection, $parameter)) {
                 takeActionOn($this->connection, $this->telegramId, $parameter);
                 $this->editMessage($this->chatId, $this->messageId, 'Target chosen!');
+            }
+            else $this->sendMessageToChat('Invalid target!');
+        }
+        else if ($command === '/lynch' && $parameter !== false) {
+            if (doesTelegramIdExist($this->connection, $parameter) && !isDead($this->connection, $parameter)) {
+                takeActionOn($this->connection, $this->telegramId, $parameter);
+                $this->editMessage($this->chatId, $this->messageId, 'Target chosen!');
+                $chatId = getChatId($this->connection, $this->telegramId);
+                $playerName = getPlayerName($this->connection, $this->telegramId);
+                $targetName = getPlayerName($this->connection, $parameter);
+                $this->sendMessageToPlayer($playerName.' has decided to lynch '.$targetName.'!', $chatId);
             }
             else $this->sendMessageToChat('Invalid target!');
         }
@@ -93,13 +105,12 @@ class WerewolfBot extends Bot {
         $roles = divideRoles($this->roles);
         $totalPlayers = count($players);
         $baddies = ceil($totalPlayers / 5);
-        $assignedBaddies = 0;
         foreach($players as $player) {
-            if ($assignedBaddies < $baddies) {
+            if ($this->baddies < $baddies) {
                 //set random evil role
                 $role = $roles['evil'][array_rand($roles['evil'])];
                 setRole($this->connection, $this->chatId, $player, $role->getId());
-                $assignedBaddies++;
+                $this->baddies++;
             }
             else {
                 //set a good role
@@ -109,18 +120,32 @@ class WerewolfBot extends Bot {
             //message player
             $this->sendMessageToPlayer('You are a '.$role->getName().chr(10).$role->getDescription(), $player);
         }
-        while($assignedBaddies > 0) {//run game till all assigned baddies die
-            $this->sendMessageToChat('Night has started! Players have 60 seconds to conduct their actions!');
+        while($this->baddies > 0) {//run game till all assigned baddies die
             $this->prepareNight();
             sleep(60);
             $this->runNight();
-            if (true) {//force close loop for now
-                $assignedBaddies--;
-            }
+            $this->prepareDay();
+            sleep(60);
+            $this->runDay();
         }
         return $this->endGame();
     }
+    private function prepareDay() {
+        $this->sendMessageToChat('The day has started! Players have 60 seconds to decide who the culprit is!');
+        $players = getPlayerData($this->connection, $this->chatId);
+        foreach($players as $player) {
+            $this->sendMessageToPlayer('Who do you want to lynch?', $player['telegram_id'], generateKeyboard($player, $players, 'lynch'));
+        }
+    }
+    private function runDay() {
+        $players = getPlayerData($this->connection, $this->chatId);
+        $this->baddies--; //forcefully decrease now
+        foreach($players as $player) {
+            //lynch
+        }
+    }
     private function prepareNight() {
+        $this->sendMessageToChat('Night has started! Players have 60 seconds to conduct their actions!');
         $players = getPlayerData($this->connection, $this->chatId);
         foreach($players as $player) {
             if($this->roles[$player['role']]->getTaskType() === taskTypes::night) {
@@ -137,7 +162,7 @@ class WerewolfBot extends Bot {
             if($this->roles[$player['role']]->getTaskType() === taskTypes::night) {
                 //do task depending on role
                 if ($player['role'] === RoleId::werewolf) {
-                    $targetId = takenActionOn($this->connection, $player['telegram_id']);
+                    $targetId = $player['took_action_on'];
                     if ($targetId !== 0) {
                         //kill target
                         $someoneDied = true;

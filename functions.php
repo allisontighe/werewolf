@@ -58,15 +58,15 @@ function takeActionOn(Connection $connection, int $telegramId, int $targetId): v
     $PDOStatement = $connection->prepare('UPDATE players SET took_action_on = ? WHERE telegram_id = ?');
     $PDOStatement->execute([$targetId, $telegramId]);
 }
-function takenActionOn(Connection $connection, int $telegramId): int {
-    $PDOStatement = $connection->prepare('SELECT took_action_on FROM players WHERE telegram_id = ?');
-    $PDOStatement->execute([$telegramId]);
-    return intval($PDOStatement->fetchColumn());
-}
 function getPlayerName(Connection $connection, int $telegramId): string {
     $PDOStatement = $connection->prepare('SELECT name FROM players WHERE telegram_id = ?');
     $PDOStatement->execute([$telegramId]);
     return $PDOStatement->fetchColumn();
+}
+function getChatId(Connection $connection, int $telegramId): int {
+    $PDOStatement = $connection->prepare('SELECT chat_id FROM players WHERE telegram_id = ?');
+    $PDOStatement->execute([$telegramId]);
+    return intval($PDOStatement->fetchColumn());
 }
 function killPlayer(Connection $connection, int $telegramId): void {
     $PDOStatement = $connection->prepare('UPDATE players SET dead = true WHERE telegram_id = ?');
