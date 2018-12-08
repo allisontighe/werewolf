@@ -7,6 +7,4 @@ if(!$update){
     echo "Werewolf Bot";
     exit();
 }
-if (isset($update['message'])) {
-    (new WerewolfBot($update['message']))->process();
-}
+else (new WerewolfBot($update))->process();

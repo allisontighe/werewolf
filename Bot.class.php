@@ -6,12 +6,13 @@ class Bot {
     protected $messageId;
     protected $messageText;
     private const TOKEN = '682186483:AAEfr0p9f2wzYvtA6ay816aQ3HJnG7kW77E';
-    public function __construct(array $message) {
-        $this->chatId = (int)$message['chat']['id'] ?? 0;
-        $this->telegramId = (int)$message['from']['id'] ?? 0;
-        $this->messageId = (int)$message['message_id'] ?? 0;
-        $this->messageText = $message['text'] ?? '';
-        $this->firstName = $message['from']['first_name'] ?? '';
+    public function __construct(array $request) {
+        $this->chatId = $request['message']['chat']['id'] ?? $request['callback_query']['message']['chat']['id'] ?? exit('Chat id not set');
+        $this->telegramId = $request['message']['from']['id'] ?? $request['callback_query']['from']['id'] ?? exit('Telegram id not set');
+        $this->messageId = $request['message']['message_id'] ?? $request['callback_query']['message']['message_id'] ?? exit('Message id not set');
+        $this->messageText = $request['message']['text'] ?? '';
+        $this->firstName = $request['message']['from']['first_name'] ?? $request['callback_query']['from']['first_name'] ?? '';
+        $this->queryId = $request['callback_query']['id'] ?? 0;
     }
     private function send($method, $parameters) {
         $curl = curl_init('https://api.telegram.org/bot'.self::TOKEN.'/'.$method);
