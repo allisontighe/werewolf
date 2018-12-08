@@ -5,6 +5,7 @@ class Bot {
     protected $firstName;
     protected $messageId;
     protected $messageText;
+    protected $queryId;
     private const TOKEN = '682186483:AAEfr0p9f2wzYvtA6ay816aQ3HJnG7kW77E';
     public function __construct(array $request) {
         $this->chatId = $request['message']['chat']['id'] ?? $request['callback_query']['message']['chat']['id'] ?? exit('Chat id not set');
