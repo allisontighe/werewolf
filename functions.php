@@ -72,6 +72,15 @@ function killPlayer(Connection $connection, int $telegramId): void {
     $PDOStatement = $connection->prepare('UPDATE players SET dead = true WHERE telegram_id = ?');
     $PDOStatement->execute([$telegramId]);
 }
+function getWaitInterval(Connection $connection, int $chatId): string {
+    $PDOStatement = $connection->prepare('SELECT wait_interval FROM chats WHERE chat_id = ?');
+    $PDOStatement->execute([$chatId]);
+    return intval($PDOStatement->fetchColumn());
+}
+function setStatus(Connection $connection, int $chatId, int $status): void {
+    $PDOStatement = $connection->prepare('UPDATE chats SET status = ? WHERE chat_id = ?');
+    $PDOStatement->execute([$status, $chatId]);
+}
 function makePlayerList(Connection $connection, int $chatId): string {
     $players = getTelegramNamesFromChat($connection, $chatId);
     $string = '*Player list (Total: '.count($players).')*'.chr(10);

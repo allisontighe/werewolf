@@ -16,7 +16,7 @@ class Bot {
         $this->firstName = $request['message']['from']['first_name'] ?? $request['callback_query']['from']['first_name'] ?? '';
         $this->queryId = $request['callback_query']['id'] ?? 0;
     }
-    private function send($method, $parameters) {
+    public static function send($method, $parameters) {
         $curl = curl_init('https://api.telegram.org/bot'.getenv('BOT_TOKEN').'/'.$method);
         curl_setopt($curl, CURLOPT_HEADER, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -32,15 +32,11 @@ class Bot {
         http_response_code(200);
         echo json_encode(['method' => 'sendMessage', 'chat_id' => $this->chatId, 'text' => $message]);
     }
-    protected function sendMessageToChat(string $message, array $keyboard = []) {
-        if (empty($keyboard)) return $this->send('sendMessage', ['chat_id' => $this->chatId, 'text' => $message, 'parse_mode' => 'Markdown']);
-        else return $this->send('sendMessage', ['chat_id' => $this->chatId, 'text' => $message, 'parse_mode' => 'Markdown', 'reply_markup' => json_encode(['inline_keyboard' => $keyboard])]);
+    protected function editMessage(int $chatId, int $messageId, string $message) {
+        Bot::send('editMessageText', ['chat_id' => $chatId, 'message_id' => $messageId, 'text' => $message, 'parse_mode' => 'Markdown']);
     }
     protected function sendMessageToPlayer(string $message, int $playerId, array $keyboard = []) {
-        if (empty($keyboard)) $this->send('sendMessage', ['chat_id' => $playerId, 'text' => $message, 'parse_mode' => 'Markdown']);
-        else $this->send('sendMessage', ['chat_id' => $playerId, 'text' => $message, 'parse_mode' => 'Markdown', 'reply_markup' => json_encode(['inline_keyboard' => $keyboard])]);
-    }
-    protected function editMessage(int $chatId, int $messageId, string $message) {
-        $this->send('editMessageText', ['chat_id' => $chatId, 'message_id' => $messageId, 'text' => $message, 'parse_mode' => 'Markdown']);
+        if (empty($keyboard)) Bot::send('sendMessage', ['chat_id' => $playerId, 'text' => $message, 'parse_mode' => 'Markdown']);
+        else Bot::send('sendMessage', ['chat_id' => $playerId, 'text' => $message, 'parse_mode' => 'Markdown', 'reply_markup' => json_encode(['inline_keyboard' => $keyboard])]);
     }
 }
