@@ -9,17 +9,11 @@ class WerewolfBot extends Bot {
     private $roles = [];
     private $baddies = 0;
     private function loadRoles() {
-<<<<<<< HEAD
+
         $this->roles[RoleId::villager] = new Role(RoleId::villager, 'villager', false, taskTypes::none, 'The village plower.');
         $this->roles[RoleId::werewolf] = new Role(RoleId::werewolf, 'werewolf', true, taskTypes::night, 'Stalking your prey at night you kill and devour the bodies of the villagers one by one.');
         $this->roles[RoleId::clown] = new Role(RoleId::clown, 'clown', false, taskTypes::none, 'You are the Village clown, you play pranks on the villagers at night and though you are good, you are sometimes mistaken for bad');
         $this->roles[RoleId::drunk] = new Role(RoleId::drunk, 'drunk', false, taskTypes::none, 'You are the village drunk, too drunk to do anything at night');
-=======
-        $this->roles[RoleId::villager] = new Role(RoleId::villager, 'Villager', false, taskTypes::none, 'The village plower.');
-        $this->roles[RoleId::werewolf] = new Role(RoleId::werewolf, 'Werewolf', true, taskTypes::night, 'Stalking your prey at night you kill and devour the bodies of the villagers one by one.');
-        $this->roles[RoleId::clown] = new Role(RoleId::clown, 'Clown', false, taskTypes::none, 'You are the Village clown, you play pranks on the villagers at night and though you are good, you are sometimes mistaken for bad');
-        $this->roles[RoleId::drunk] = new Role(RoleId::drunk, 'Drunk', false, taskTypes::none, 'You are the village drunk, too drunk to do anything at night');
->>>>>>> branch 'master' of https://github.com/allisontighe/werewolf.git
     }
     public function __construct(array $message) {
         $this->connection = new Connection;
