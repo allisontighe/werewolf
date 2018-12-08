@@ -29,14 +29,13 @@ class Bot {
         http_response_code(200);
         echo json_encode(['method' => 'sendMessage', 'chat_id' => $this->chatId, 'text' => $message]);
     }
-    protected function sendMessageToChat(string $message) {
-        $this->send('sendMessage', ['chat_id' => $this->chatId, 'text' => $message]);
+    protected function sendMessageToChat(string $message, array $keyboard = []) {
+        if (empty($keyboard)) return $this->send('sendMessage', ['chat_id' => $this->chatId, 'text' => $message, 'parse_mode' => 'Markdown']);
+        else return $this->send('sendMessage', ['chat_id' => $this->chatId, 'text' => $message, 'parse_mode' => 'Markdown', 'reply_markup' => json_encode($keyboard)]);
     }
-    protected function sendMarkdownMessage(string $message) {
-        return $this->send('sendMessage', ['chat_id' => $this->chatId, 'text' => $message, 'parse_mode' => 'Markdown']);
-    }
-    protected function sendMessageToPlayer(string $message, int $playerId) {
-        $this->send('sendMessage', ['chat_id' => $playerId, 'text' => $message]);
+    protected function sendMessageToPlayer(string $message, int $playerId, array $keyboard = []) {
+        if (empty($keyboard)) $this->send('sendMessage', ['chat_id' => $playerId, 'text' => $message, 'parse_mode' => 'Markdown']);
+        else $this->send('sendMessage', ['chat_id' => $playerId, 'text' => $message, 'parse_mode' => 'Markdown', 'reply_markup' => json_encode($keyboard)]);
     }
     protected function editMessage(int $messageId, string $message) {
         $this->send('editMessageText', ['chat_id' => $this->chatId, 'message_id' => $messageId, 'text' => $message, 'parse_mode' => 'Markdown']);
