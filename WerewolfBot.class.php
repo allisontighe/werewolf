@@ -24,18 +24,26 @@ class WerewolfBot extends Bot {
             $this->loadRoles();
             $this->beginGameSequence();
         }
-        else if ($this->messageText === '/join') {
-            //check if already joined
-            if (doesTelegramIdExist($this->connection, $this->chatId, $this->telegramId)) {
-                $this->sendEcho('You have already joined the game!');
+        else if (strpos($this->messageText, '/start ')) {
+            //parse request
+            $spaceIndex = strpos($this->messageText, ' ');
+            $chatId = trim(substr($this->messageText, $spaceIndex));
+            if (doesChatIdExist($this->connection, $chatId)) {
+                //check if already joined
+                if (doesTelegramIdExist($this->connection, $chatId, $this->telegramId)) {
+                    $this->sendEcho('You have already joined the game!');
+                }
+                else {
+                    addToGame($this->connection, $chatId, $this->telegramId, $this->firstName);
+                    $playerListMessageId = getMessageId($this->connection, $chatId);
+                    if ($playerListMessageId !== 0) {
+                        $this->editMessage($playerListMessageId, $this->makePlayerList());
+                    }
+                    $this->sendEcho('You have been added to the game!');
+                }
             }
             else {
-                addToGame($this->connection, $this->chatId, $this->telegramId, $this->firstName);
-                $playerListMessageId = getMessageId($this->connection, $this->chatId);
-                if ($playerListMessageId !== 0) {
-                    $this->editMessage($playerListMessageId, $this->makePlayerList());
-                }
-                $this->sendEcho('Added '.$this->firstName.' to the game!');
+                $this->sendEcho('A game is not currently running.');
             }
         }
     }
@@ -75,9 +83,10 @@ class WerewolfBot extends Bot {
         //wait for joiners
         $i = 0;
         $limit = 2;
+        $keyboard = [[['text' => 'Join', 'url' => 'https://t.me/'.BotInfo::username.'?start='.$this->chatId]]];
         while ($i < $limit) {
             $timeLeft = ($limit - $i) * 30;
-            $this->sendMessageToChat($timeLeft.' seconds left to join!');
+            $this->sendMessageToChat($timeLeft.' seconds left to join!', $keyboard);
             $i++;
             sleep(30);
         }

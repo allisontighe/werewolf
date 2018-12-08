@@ -1,4 +1,5 @@
 <?php
+require_once 'constants.php';
 class Bot {
     protected $chatId;
     protected $telegramId;
@@ -6,7 +7,6 @@ class Bot {
     protected $messageId;
     protected $messageText;
     protected $queryId;
-    private const TOKEN = '682186483:AAEfr0p9f2wzYvtA6ay816aQ3HJnG7kW77E';
     public function __construct(array $request) {
         $this->chatId = $request['message']['chat']['id'] ?? $request['callback_query']['message']['chat']['id'] ?? exit('Chat id not set');
         $this->telegramId = $request['message']['from']['id'] ?? $request['callback_query']['from']['id'] ?? exit('Telegram id not set');
@@ -16,7 +16,7 @@ class Bot {
         $this->queryId = $request['callback_query']['id'] ?? 0;
     }
     private function send($method, $parameters) {
-        $curl = curl_init('https://api.telegram.org/bot'.self::TOKEN.'/'.$method);
+        $curl = curl_init('https://api.telegram.org/bot'.BotInfo::token.'/'.$method);
         curl_setopt($curl, CURLOPT_HEADER, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-type: application/json']);
@@ -33,11 +33,11 @@ class Bot {
     }
     protected function sendMessageToChat(string $message, array $keyboard = []) {
         if (empty($keyboard)) return $this->send('sendMessage', ['chat_id' => $this->chatId, 'text' => $message, 'parse_mode' => 'Markdown']);
-        else return $this->send('sendMessage', ['chat_id' => $this->chatId, 'text' => $message, 'parse_mode' => 'Markdown', 'reply_markup' => json_encode($keyboard)]);
+        else return $this->send('sendMessage', ['chat_id' => $this->chatId, 'text' => $message, 'parse_mode' => 'Markdown', 'reply_markup' => json_encode(['inline_keyboard' => $keyboard])]);
     }
     protected function sendMessageToPlayer(string $message, int $playerId, array $keyboard = []) {
         if (empty($keyboard)) $this->send('sendMessage', ['chat_id' => $playerId, 'text' => $message, 'parse_mode' => 'Markdown']);
-        else $this->send('sendMessage', ['chat_id' => $playerId, 'text' => $message, 'parse_mode' => 'Markdown', 'reply_markup' => json_encode($keyboard)]);
+        else $this->send('sendMessage', ['chat_id' => $playerId, 'text' => $message, 'parse_mode' => 'Markdown', 'reply_markup' => json_encode(['inline_keyboard' => $keyboard])]);
     }
     protected function editMessage(int $messageId, string $message) {
         $this->send('editMessageText', ['chat_id' => $this->chatId, 'message_id' => $messageId, 'text' => $message, 'parse_mode' => 'Markdown']);
