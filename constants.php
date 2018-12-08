@@ -11,6 +11,5 @@ abstract class RoleId {
     public const clown = 2;
 }
 abstract class BotInfo {
-    public const token = '682186483:AAEfr0p9f2wzYvtA6ay816aQ3HJnG7kW77E';
     public const username = 'betteradmin_bot';
 }

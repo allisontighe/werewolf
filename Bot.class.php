@@ -17,7 +17,7 @@ class Bot {
         $this->queryId = $request['callback_query']['id'] ?? 0;
     }
     private function send($method, $parameters) {
-        $curl = curl_init('https://api.telegram.org/bot'.BotInfo::token.'/'.$method);
+        $curl = curl_init('https://api.telegram.org/bot'.getenv('BOT_TOKEN').'/'.$method);
         curl_setopt($curl, CURLOPT_HEADER, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-type: application/json']);
