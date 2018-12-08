@@ -28,7 +28,7 @@ class WerewolfBot extends Bot {
             addChat($this->connection, $this->chatId);
             addToGame($this->connection, $this->chatId, $this->telegramId, $this->firstName);
             $this->sendEcho('A werewolf game is starting!');
-            fopen('Game.php'); //run game script
+            include_once('Game.php'); //run game script
         }
         else if ($command === '/eat' && $parameter !== false) {
             if (doesTelegramIdExist($this->connection, $parameter) && !isDead($this->connection, $parameter)) {
