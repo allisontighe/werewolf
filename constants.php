@@ -5,3 +5,8 @@ abstract class taskTypes {
     public const evening = 2;
     public const night = 3;
 }
+abstract class RoleId {
+    public const villager = 0;
+    public const werewolf = 1;
+    public const clown = 2;
+}

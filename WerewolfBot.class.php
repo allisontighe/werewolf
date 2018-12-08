@@ -48,10 +48,9 @@ class WerewolfBot extends Bot {
         return $string;
     }
     private function loadRoles() {
-        //always retain the numerical order!
-        $this->roles[] = new Role(0, 'Villager', false, taskTypes::none, 'The village plower.');
-        $this->roles[] = new Role(1, 'Werewolf', true, taskTypes::night, 'The everyday baddie.');
-        $this->roles[] = new Role(2, 'Clown', false, taskTypes::none, 'Silver add something here :P');
+        $this->roles[RoleId::villager] = new Role(RoleId::villager, 'Villager', false, taskTypes::none, 'The village plower.');
+        $this->roles[RoleId::werewolf] = new Role(RoleId::werewolf, 'Werewolf', true, taskTypes::night, 'The everyday baddie.');
+        $this->roles[RoleId::clown] = new Role(RoleId::clown, 'Clown', false, taskTypes::none, 'You are the Village clown, you play pranks on the villagers at night and though you are good, you are sometimes mistaken for bad');
     }
     private function divideRoles(): array {
         //divide into good or evil
@@ -84,7 +83,7 @@ class WerewolfBot extends Bot {
         }
         //check if enough players joined
         $players = getTelegramIdsFromChat($this->connection, $this->chatId);
-        if (count($players) < 5 && false) {//disable for now
+        if (count($players) < 5) {
             return $this->sendMessageToChat('Joining period ended! Not enough players present to start the game!');
         }
         
@@ -110,11 +109,26 @@ class WerewolfBot extends Bot {
             //message player
             $this->sendMessageToPlayer('You are a '.$role->getName().chr(10).$role->getDescription(), $player);
         }
-        /* This isnt ready yet!!
         while($assignedBaddies > 0) {//run game till all assigned baddies die
+            $this->sendMessageToChat('Night has started! Players have 60 seconds to conduct their actions!');
+            $this->prepareNight();
+            sleep(60);
             $this->runNight();
-        }*/
+            if (true) {//force close loop for now
+                break;
+            }
+        }
         return $this->endGame();
+    }
+    private function prepareNight() {
+        $players = getPlayerData($this->connection, $this->chatId);
+        foreach($players as $player) {
+            if($this->roles[$player['role']]->getTaskType() === taskTypes::night) {
+                if ($player['role'] === RoleId::werewolf) {
+                    
+                }
+            }
+        }
     }
     private function runNight() {
         $players = getPlayerData($this->connection, $this->chatId);
