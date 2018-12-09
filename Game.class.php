@@ -42,6 +42,8 @@ class Game {
         }
         //start game
         $this->sendMessage($this->chatId, 'Joining period ended! Please wait while the roles are assigned!');
+        //assign roles
+        $this->assignRoles($players);
         //run game till all assigned baddies die
         while($this->baddies > 0 && $this->players > 2) {
             $this->prepare();
