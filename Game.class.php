@@ -34,7 +34,7 @@ class Game {
         //check if enough players joined
         $players = getTelegramIdsFromChat($this->connection, $this->chatId);
         $this->players = count($players);
-        if ($this->players < 4) {
+        if ($this->players < 3) {
             //delete chat
             deleteChatId($this->connection, $this->chatId);
             $this->sendMessage($this->chatId, 'Joining period ended! Not enough players present to start the game!');
