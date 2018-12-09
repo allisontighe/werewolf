@@ -47,9 +47,9 @@ class Game {
         //run game till all assigned baddies die
         while($this->baddies > 0 && $this->players > 2) {
             $this->prepare();
+            sleep(60);
             $this->run();
             $this->updateTime();
-            sleep(60);
         }
         $this->endGame();
     }
