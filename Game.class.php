@@ -8,6 +8,7 @@ class Game {
     private $chatId;
     private $roles = [];
     private $baddies = 0;
+    private $players = 0;
     private $taskTime;
     public function __construct(Connection $connection, int $chatId) {
         $this->connection = $connection;
@@ -32,7 +33,8 @@ class Game {
         $this->waitForJoiners();
         //check if enough players joined
         $players = getTelegramIdsFromChat($this->connection, $this->chatId);
-        if (count($players) < 4) {
+        $this->players = count($players);
+        if ($this->players < 4) {
             //delete chat
             deleteChatId($this->connection, $this->chatId);
             $this->sendMessage($this->chatId, 'Joining period ended! Not enough players present to start the game!');
@@ -41,7 +43,7 @@ class Game {
         //start game
         $this->sendMessage($this->chatId, 'Joining period ended! Please wait while the roles are assigned!');
         //run game till all assigned baddies die
-        while($this->baddies > 0) {
+        while($this->baddies > 0 && $this->players > 2) {
             $this->prepare();
             $this->run();
             $this->updateTime();
@@ -74,6 +76,7 @@ class Game {
     }
     private function run() {
         $players = getPlayerData($this->connection, $this->chatId);
+        $lynchArray = [];
         foreach($players as $player) {
             if($this->roles[$player['role']]->getTaskType() === $this->taskTime) {
                 //do task depending on role
@@ -82,6 +85,7 @@ class Game {
                     if ($targetId !== 0) {
                         //kill target
                         killPlayer($this->connection, $targetId);
+                        $this->players--;
                         $this->sendMessage($this->chatId, getPlayerName($this->connection, $targetId).' was eaten by the wolf!');
                         $this->sendMessage($targetId, 'NOM NOM you were eaten!');
                     }
@@ -89,7 +93,33 @@ class Game {
             }
             if ($this->taskTime === taskTypes::day) {
                 //do lynch stuff
-                $this->baddies--; //forcefully decrease now
+                if (array_key_exists($player['took_action_on'], $lynchArray)) {
+                    $lynchArray[$player['took_action_on']]++;
+                }
+                else $lynchArray[$player['took_action_on']] = 1;
+            }
+        }
+        if ($this->taskTime === taskTypes::day) {
+            //get max voted for player key
+            $lynchIds = array_keys($lynchArray, max($lynchArray));
+            //see if more than one was max
+            if (count($lynchIds) > 1) {
+                //if so, dont lynch
+                $this->sendMessage($this->chatId, 'The villagers were unable to come up with a decision!');
+            }
+            else {
+                //lynch!
+                killPlayer($this->connection, $lynchIds[0]);
+                $this->players--;
+                //check if player was baddie
+                $playerIndex = array_search($lynchIds[0], array_column($players, 'telegram_id'));
+                if ($this->roles[$players[$playerIndex]['role']]->getEvil()) {
+                    //decrease baddies
+                    $this->baddies--;
+                }
+                //announce
+                $this->sendMessage($lynchIds[0], 'You were lynched!');
+                $this->sendMessage($this->chatId, $players[$playerIndex]['name'].' was lynched! He was a '.$this->roles[$players[$playerIndex]['role']]->getName().'!');
             }
         }
     }
