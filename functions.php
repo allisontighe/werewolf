@@ -49,6 +49,11 @@ function getPlayerData(Connection $connection, int $chatId): array {
     $PDOStatement->execute([$chatId]);
     return $PDOStatement->fetchAll(PDO::FETCH_ASSOC);
 }
+function getAllPlayerData(Connection $connection, int $chatId): array {
+    $PDOStatement = $connection->prepare('SELECT name, role, telegram_id, dead FROM players WHERE chat_id = ?');
+    $PDOStatement->execute([$chatId]);
+    return $PDOStatement->fetchAll(PDO::FETCH_ASSOC);
+}
 function isDead(Connection $connection, int $telegramId): bool {
     $PDOStatement = $connection->prepare('SELECT dead FROM players WHERE telegram_id = ?');
     $PDOStatement->execute([$telegramId]);

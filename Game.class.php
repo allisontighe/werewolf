@@ -61,6 +61,9 @@ class Game {
         else if ($this->taskTime === taskTypes::day) {
             $this->sendMessage($this->chatId, 'The day has started! Players have 60 seconds to decide who the culprit is!');
         }
+        else if ($this->taskTime === taskTypes::evening) {
+            $this->sendMessage($this->chatId, 'Its evening time! Players have 60 seconds to conduct their actions!');
+        }
         foreach($players as $player) {
             if($this->roles[$player['role']]->getTaskType() === $this->taskTime) {
                 if ($player['role'] === RoleId::werewolf) {
@@ -163,6 +166,17 @@ class Game {
         }
     }
     private function endGame() {
+        $players = getAllPlayerData($this->connection, $this->chatId);
+        $text = '';
+        foreach($players as $player) {
+            $text .= '['.$player['name'].'](tg://user?id='.$player['telegram_id'].') - '.$this->roles[$player['role']]->getName();
+            if ($player['dead']) $text .= ' (Dead)';
+            else $text .= ' (Alive)';
+            if ($this->roles[$player['role']]->getEvil() && $this->baddies > 0) $text .= ' *Won*';
+            else $text .= ' *Lost*';
+            $text .= chr(10);
+        }
+        $this->sendMessage($this->chatId, $text);
         $this->sendMessage($this->chatId, 'The game has ended!');
         deleteChatId($this->connection, $this->chatId);
     }
