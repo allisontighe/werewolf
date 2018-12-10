@@ -156,6 +156,8 @@ class Game {
             $limit = getWaitInterval($this->connection, $this->chatId);
         }
         foreach ($messages as $message) {
+            //decode
+            $message = json_decode($message, true);
             //delete join message
             $this->deleteMessage($message['result']['message_id'], $this->chatId);
         }
