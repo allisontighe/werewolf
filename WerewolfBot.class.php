@@ -52,6 +52,26 @@ class WerewolfBot extends Bot {
             }
             else $this->sendEcho('Invalid target!');
         }
+        else if ($command === '/extend' && $parameter !== false) {
+            if (doesChatIdExist($this->connection, $this->chatId)) {
+                if (is_numeric($parameter)) {
+                    $timeLeft = getWaitInterval($this->connection, $this->chatId) * Interval::join;
+                    //see if addition is greater than 5 minutes
+                    if ($timeLeft + $parameter > 300) {
+                        //set to 5 minutes
+                        setWaitInterval($this->connection, $this->chatId, floor(300 / Interval::join));
+                        $this->sendEcho('Time left: *5:00* minutes!');
+                    }
+                    else {
+                        $changeBy = floor($parameter / Interval::join);
+                        changeWaitInterval($this->connection, $this->chatId, $changeBy);
+                        $this->sendEcho('Time left: *'.floor(($changeBy * Interval::join + $timeLeft) / 60).':'.(($changeBy * Interval::join + $timeLeft) % 60)).'* minutes!';
+                    }
+                }
+                else $this->sendEcho('Sorry, I couldn\'t quite understand what you meant by that. Could you please enter a number? Please?');
+            }
+            else $this->sendEcho('No game\'s running in the first place :P');
+        }
         else if ($command === '/start' && $parameter !== false) {
             $chatId = $parameter;
             if (doesChatIdExist($this->connection, $chatId)) {

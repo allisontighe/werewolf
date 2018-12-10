@@ -82,6 +82,14 @@ function getWaitInterval(Connection $connection, int $chatId): string {
     $PDOStatement->execute([$chatId]);
     return intval($PDOStatement->fetchColumn());
 }
+function changeWaitInterval(Connection $connection, int $chatId, int $value): void {
+    $PDOStatement = $connection->prepare('UPDATE chats SET wait_interval = wait_interval + ? WHERE chat_id = ?');
+    $PDOStatement->execute([$value, $chatId]);
+}
+function setWaitInterval(Connection $connection, int $chatId, int $value): void {
+    $PDOStatement = $connection->prepare('UPDATE chats SET wait_interval = ? WHERE chat_id = ?');
+    $PDOStatement->execute([$value, $chatId]);
+}
 function setStatus(Connection $connection, int $chatId, int $status): void {
     $PDOStatement = $connection->prepare('UPDATE chats SET status = ? WHERE chat_id = ?');
     $PDOStatement->execute([$status, $chatId]);

@@ -14,3 +14,6 @@ abstract class RoleId {
 abstract class BotInfo {
     public const username = 'betteradmin_bot';
 }
+abstract class Interval {
+    public const join = 30;
+}

@@ -143,12 +143,15 @@ class Game {
         else if ($this->taskTime === taskTypes::evening) $this->taskTime = taskTypes::night;
     }
     private function waitForJoiners() {
-        $limit = getWaitInterval($this->connection, $this->chatId);
         $keyboard = [[['text' => 'Join', 'url' => 'https://t.me/'.BotInfo::username.'?start='.$this->chatId]]];
-        for ($i = 0; $i < $limit; $i++) {
-            $timeLeft = ($limit - $i) * 30;
-            $this->sendMessage($this->chatId, $timeLeft.' seconds left to join!', $keyboard);
-            sleep(30);
+        $limit = getWaitInterval($this->connection, $this->chatId);
+        while ($limit > 0) {
+            $this->sendMessage($this->chatId, ($limit * Interval::join).' seconds left to join!', $keyboard);
+            sleep(Interval::join);
+            //decrease interval
+            changeWaitInterval($this->connection, $this->chatId, -1);
+            //get new interval
+            $limit = getWaitInterval($this->connection, $this->chatId);
         }
     }
     private function assignRoles(array $players) {
