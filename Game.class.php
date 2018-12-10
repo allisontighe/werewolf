@@ -114,10 +114,10 @@ class Game {
                         $this->sendMessage($targetId, 'You wake up to the sound of a door slamming, as you turn on the light you see your house is covered in honey, the clown has pranked you!');
                     }
                 }
-                else if ($player['role'] === RoleId::slacker && $player['status'] === Status::offline && $this->day > 0) {
-                    setPlayerStatus($this->connection, $this->telegramId, Status::none);
-                    $this->sendMessage($this->chatId, '['.$player['name'].'](tg://user?id='.$player['telegram_id'].') joins the game!');
-                }
+            }
+            if ($player['role'] === RoleId::slacker && $player['status'] === Status::offline && $this->day > 0) {
+                setPlayerStatus($this->connection, $this->telegramId, Status::none);
+                $this->sendMessage($this->chatId, '['.$player['name'].'](tg://user?id='.$player['telegram_id'].') joins the game!');
             }
             if ($this->taskTime === taskTypes::day) {
                 //do lynch stuff
