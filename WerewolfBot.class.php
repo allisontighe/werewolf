@@ -62,10 +62,15 @@ class WerewolfBot extends Bot {
                         setWaitInterval($this->connection, $this->chatId, floor(300 / Interval::join));
                         $this->sendEcho('Time left: *5:00* minutes!');
                     }
+                    else if ($timeLeft + $parameter <= 0) {
+                        //set to 5 minutes
+                        setWaitInterval($this->connection, $this->chatId, 0);
+                        $this->sendEcho('The game will start soon!');
+                    }
                     else {
                         $changeBy = floor($parameter / Interval::join);
                         changeWaitInterval($this->connection, $this->chatId, $changeBy);
-                        $this->sendEcho('Time left: *'.floor(($changeBy * Interval::join + $timeLeft) / 60).':'.(($changeBy * Interval::join + $timeLeft) % 60)).'* minutes!';
+                        $this->sendEcho('Time left: *'.floor(($changeBy * Interval::join + $timeLeft) / 60).':'.(($changeBy * Interval::join + $timeLeft) % 60).'* minutes!');
                     }
                 }
                 else $this->sendEcho('Sorry, I couldn\'t quite understand what you meant by that. Could you please enter a number? Please?');

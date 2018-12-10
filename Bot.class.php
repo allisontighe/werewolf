@@ -30,7 +30,7 @@ class Bot {
     protected function sendEcho(string $message) {
         header('Content-Type: application/json');
         http_response_code(200);
-        echo json_encode(['method' => 'sendMessage', 'chat_id' => $this->chatId, 'text' => $message]);
+        echo json_encode(['method' => 'sendMessage', 'chat_id' => $this->chatId, 'text' => $message, 'parse_mode' => 'Markdown']);
     }
     protected function editMessage(int $chatId, int $messageId, string $message) {
         Bot::send('editMessageText', ['chat_id' => $chatId, 'message_id' => $messageId, 'text' => $message, 'parse_mode' => 'Markdown']);
