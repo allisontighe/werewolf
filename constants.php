@@ -10,6 +10,7 @@ abstract class RoleId {
     public const werewolf = 1;
     public const clown = 2;
     public const drunk = 3;
+    public const slacker = 4;
 }
 abstract class BotInfo {
     public const username = 'betteradmin_bot';

@@ -10,6 +10,7 @@ class Game {
     private $baddies = 0;
     private $players = 0;
     private $taskTime;
+    private $day = 0;
     public function __construct(Connection $connection, int $chatId) {
         $this->connection = $connection;
         $this->chatId = $chatId;
@@ -22,6 +23,7 @@ class Game {
         $this->roles[RoleId::werewolf] = new Role(RoleId::werewolf, 'Werewolf', true, taskTypes::night, 'Stalking your prey at night you kill and devour the bodies of the villagers one by one.');
         $this->roles[RoleId::clown] = new Role(RoleId::clown, 'Clown', false, taskTypes::night, 'You are the Village clown, you play pranks on the villagers at night and though you are good, you are sometimes mistaken for bad');
         $this->roles[RoleId::drunk] = new Role(RoleId::drunk, 'Drunk', false, taskTypes::none, 'You are the village drunk, too drunk to do anything at night');
+        //$this->roles[RoleId::slacker] = new Role(RoleId::slacker, 'Slacker', false, taskTypes::none, 'You are a slacker! The slacker joins the game a day later than other players');
     }
     private function process(): void {
         //update chat status
@@ -148,6 +150,8 @@ class Game {
         if ($this->taskTime === taskTypes::night) $this->taskTime = taskTypes::day;
         else if ($this->taskTime === taskTypes::day) $this->taskTime = taskTypes::evening;
         else if ($this->taskTime === taskTypes::evening) $this->taskTime = taskTypes::night;
+        //increase day
+        $this->day++;
     }
     private function waitForJoiners() {
         $keyboard = [[['text' => 'Join', 'url' => 'https://t.me/'.BotInfo::username.'?start='.$this->chatId]]];
