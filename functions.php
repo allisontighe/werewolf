@@ -60,7 +60,7 @@ function isDead(Connection $connection, int $telegramId): bool {
     return boolval($PDOStatement->fetchColumn());
 }
 function takeActionOn(Connection $connection, int $telegramId, int $targetId): void {
-    $PDOStatement = $connection->prepare('UPDATE players SET took_action_on = ? WHERE telegram_id = ?');
+    $PDOStatement = $connection->prepare('UPDATE players SET took_action_on = ?, last_action = CURRENT_TIMESTAMP WHERE telegram_id = ?');
     $PDOStatement->execute([$targetId, $telegramId]);
 }
 function clearActions(Connection $connection, int $chatId): void {
