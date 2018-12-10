@@ -40,6 +40,13 @@ class WerewolfBot extends Bot {
                 $this->editMessage($this->chatId, $this->messageId, 'Target chosen!');
             }
             else $this->sendEcho('Invalid target!');
+            }
+            else if ($command === '/prank' && $parameter !== false){
+                if (doesTelegramIdExist($this->connection, $parameter) && !isDead($this->connection, $parameter)){
+                    takeActionOn($this->connection, $this->telegramId, $parameter);
+                    $this->editMessage($this->chatId, $this->messageId, 'Target Chosen!');
+            }
+            else $this->sendEcho('Invalid target!');
         }
         else if ($command === '/lynch' && $parameter !== false) {
             if (doesTelegramIdExist($this->connection, $parameter) && !isDead($this->connection, $parameter)) {
