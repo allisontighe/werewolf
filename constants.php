@@ -18,3 +18,7 @@ abstract class BotInfo {
 abstract class Interval {
     public const join = 30;
 }
+abstract class Status {
+    public const none = 0;
+    public const offline = 1;
+}

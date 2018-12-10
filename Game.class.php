@@ -23,7 +23,7 @@ class Game {
         $this->roles[RoleId::werewolf] = new Role(RoleId::werewolf, 'Werewolf', true, taskTypes::night, 'Stalking your prey at night you kill and devour the bodies of the villagers one by one.');
         $this->roles[RoleId::clown] = new Role(RoleId::clown, 'Clown', false, taskTypes::night, 'You are the Village clown, you play pranks on the villagers at night and though you are good, you are sometimes mistaken for bad');
         $this->roles[RoleId::drunk] = new Role(RoleId::drunk, 'Drunk', false, taskTypes::none, 'You are the village drunk, too drunk to do anything at night');
-        //$this->roles[RoleId::slacker] = new Role(RoleId::slacker, 'Slacker', false, taskTypes::none, 'You are a slacker! The slacker joins the game a day later than other players');
+        $this->roles[RoleId::slacker] = new Role(RoleId::slacker, 'Slacker', false, taskTypes::none, 'You are a slacker! The slacker joins the game a day later than other players');
     }
     private function process(): void {
         //update chat status
@@ -67,13 +67,17 @@ class Game {
         else if ($this->taskTime === taskTypes::evening) {
             $this->sendMessage($this->chatId, 'Its evening time! Players have 60 seconds to conduct their actions!');
         }
+        //remove offline players
+        foreach($players as $key => $player) {
+            if ($player['status'] === Status::offline) unset($players[$key]);
+        }
         foreach($players as $player) {
             if($this->roles[$player['role']]->getTaskType() === $this->taskTime) {
                 if ($player['role'] === RoleId::werewolf) {
                     $this->sendMessage($player['telegram_id'], 'Who do you want to eat tonight?', generateKeyboard($player, $players, 'eat'));
                 }
                 else if ($player['role'] === RoleId::clown) {
-                    $this->sendMessage($player['telegram_id'], 'Who do you want to prank tonight', generateKeyboard($player, $players, 'prank'));
+                    $this->sendMessage($player['telegram_id'], 'Who do you want to prank tonight?', generateKeyboard($player, $players, 'prank'));
                 }
             }
             if ($this->taskTime === taskTypes::day) {
@@ -109,6 +113,10 @@ class Game {
                         //prank target
                         $this->sendMessage($targetId, 'You wake up to the sound of a door slamming, as you turn on the light you see your house is covered in honey, the clown has pranked you!');
                     }
+                }
+                else if ($player['role'] === RoleId::slacker && $player['status'] === Status::offline && $this->day > 0) {
+                    setPlayerStatus($this->connection, $this->telegramId, Status::none);
+                    $this->sendMessage($this->chatId, '['.$player['name'].'](tg://user?id='.$player['telegram_id'].') joins the game!');
                 }
             }
             if ($this->taskTime === taskTypes::day) {
@@ -189,6 +197,9 @@ class Game {
                 //set a good role
                 $role = $roles['good'][array_rand($roles['good'])];
                 setRole($this->connection, $this->chatId, $player, $role->getId());
+                if ($role->getId() === RoleId::slacker) {
+                    setPlayerStatus($this->connection, $player, Status::offline); //set offline status for slacker
+                }
             }
             //message player
             $this->sendMessage($player, $role->getDescription());

@@ -45,7 +45,7 @@ function getTelegramNamesFromChat(Connection $connection, int $chatId): array {
     return $PDOStatement->fetchAll(PDO::FETCH_COLUMN);
 }
 function getPlayerData(Connection $connection, int $chatId): array {
-    $PDOStatement = $connection->prepare('SELECT name, role, took_action_on, telegram_id FROM players WHERE chat_id = ? AND dead = false');
+    $PDOStatement = $connection->prepare('SELECT name, role, took_action_on, telegram_id, status FROM players WHERE chat_id = ? AND dead = false');
     $PDOStatement->execute([$chatId]);
     return $PDOStatement->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -97,6 +97,10 @@ function setWaitInterval(Connection $connection, int $chatId, int $value): void 
 function setStatus(Connection $connection, int $chatId, int $status): void {
     $PDOStatement = $connection->prepare('UPDATE chats SET status = ? WHERE chat_id = ?');
     $PDOStatement->execute([$status, $chatId]);
+}
+function setPlayerStatus(Connection $connection, int $telegramId, int $status): void {
+    $PDOStatement = $connection->prepare('UPDATE players SET status = ? WHERE telegram_id = ?');
+    $PDOStatement->execute([$status, $telegramId]);
 }
 function makePlayerList(Connection $connection, int $chatId): string {
     $players = getTelegramNamesFromChat($connection, $chatId);
