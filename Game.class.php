@@ -196,4 +196,7 @@ class Game {
         if (empty($keyboard)) return Bot::send('sendMessage', ['chat_id' => $chatId, 'text' => $text, 'parse_mode' => 'Markdown']);
         else return Bot::send('sendMessage', ['chat_id' => $chatId, 'text' => $text, 'parse_mode' => 'Markdown', 'reply_markup' => json_encode(['inline_keyboard' => $keyboard])]);
     }
+    private function deleteMessage(int $messageId, int $chatId){
+        Bot::send('deleteMessage', ['chat_id' => $chatId, 'message_id' => $messageId]); 
+    }
 }
