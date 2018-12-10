@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
 require_once 'Connection.class.php';
 require_once 'Game.class.php';
 ignore_user_abort(true);
