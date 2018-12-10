@@ -136,6 +136,8 @@ class Game {
                 $this->sendMessage($this->chatId, $players[$playerIndex]['name'].' was lynched! He was a '.$this->roles[$players[$playerIndex]['role']]->getName().'!');
             }
         }
+        //clear actions
+        clearActions($this->connection, $this->chatId);
     }
     private function updateTime() {
         //update task time

@@ -63,6 +63,10 @@ function takeActionOn(Connection $connection, int $telegramId, int $targetId): v
     $PDOStatement = $connection->prepare('UPDATE players SET took_action_on = ? WHERE telegram_id = ?');
     $PDOStatement->execute([$targetId, $telegramId]);
 }
+function clearActions(Connection $connection, int $chatId): void {
+    $PDOStatement = $connection->prepare('UPDATE players SET took_action_on = 0 WHERE chat_id = ?');
+    $PDOStatement->execute([$chatId]);
+}
 function getPlayerName(Connection $connection, int $telegramId): string {
     $PDOStatement = $connection->prepare('SELECT name FROM players WHERE telegram_id = ?');
     $PDOStatement->execute([$telegramId]);
