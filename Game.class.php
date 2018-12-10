@@ -97,7 +97,7 @@ class Game {
                         if ($this->roles[$players[$index]['role']]->getEvil()) {
                             $this->baddies--;
                         }
-                        $this->sendMessage($this->chatId, $players[$index]['name'].' was eaten by the wolf! He was a '.$this->roles[$players[$index]['role']]->getName());
+                        $this->sendMessage($this->chatId, $players[$index]['name'].' was eaten by the wolf! '.$players[$index]['name'].' was a '.$this->roles[$players[$index]['role']]->getName());
                         $this->sendMessage($targetId, 'NOM NOM you were eaten!');
                     }
                 }
@@ -137,7 +137,7 @@ class Game {
                 }
                 //announce
                 $this->sendMessage($lynchIds[0], 'You were lynched!');
-                $this->sendMessage($this->chatId, $players[$playerIndex]['name'].' was lynched! He was a '.$this->roles[$players[$playerIndex]['role']]->getName().'!');
+                $this->sendMessage($this->chatId, $players[$playerIndex]['name'].' was lynched! '.$players[$playerIndex]['name'].' was a '.$this->roles[$players[$playerIndex]['role']]->getName().'!');
             }
         }
         //clear actions
