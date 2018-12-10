@@ -146,13 +146,18 @@ class Game {
     private function waitForJoiners() {
         $keyboard = [[['text' => 'Join', 'url' => 'https://t.me/'.BotInfo::username.'?start='.$this->chatId]]];
         $limit = getWaitInterval($this->connection, $this->chatId);
+        $messages = [];
         while ($limit > 0) {
-            $this->sendMessage($this->chatId, ($limit * Interval::join).' seconds left to join!', $keyboard);
+            $messages[] = $this->sendMessage($this->chatId, ($limit * Interval::join).' seconds left to join!', $keyboard);
             sleep(Interval::join);
             //decrease interval
             changeWaitInterval($this->connection, $this->chatId, -1);
             //get new interval
             $limit = getWaitInterval($this->connection, $this->chatId);
+        }
+        foreach ($messages as $message) {
+            //delete join message
+            $this->deleteMessage($message['result']['message_id'], $this->chatId);
         }
     }
     private function assignRoles(array $players) {
