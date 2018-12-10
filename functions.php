@@ -44,13 +44,13 @@ function getTelegramNamesFromChat(Connection $connection, int $chatId): array {
     $PDOStatement->execute([$chatId]);
     return $PDOStatement->fetchAll(PDO::FETCH_COLUMN);
 }
-function getAlivePlayerData(Connection $connection, int $chatId): array {
+function getPlayerData(Connection $connection, int $chatId): array {
     $PDOStatement = $connection->prepare('SELECT name, role, took_action_on, telegram_id FROM players WHERE chat_id = ? AND dead = false');
     $PDOStatement->execute([$chatId]);
     return $PDOStatement->fetchAll(PDO::FETCH_ASSOC);
 }
 function getAllPlayerData(Connection $connection, int $chatId): array {
-    $PDOStatement = $connection->prepare('SELECT name, role, telegram_id, dead, took_action_on FROM players WHERE chat_id = ?');
+    $PDOStatement = $connection->prepare('SELECT name, role, telegram_id, dead FROM players WHERE chat_id = ?');
     $PDOStatement->execute([$chatId]);
     return $PDOStatement->fetchAll(PDO::FETCH_ASSOC);
 }
