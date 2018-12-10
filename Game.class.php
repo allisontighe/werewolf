@@ -20,7 +20,7 @@ class Game {
     private function loadRoles(): void {
         $this->roles[RoleId::villager] = new Role(RoleId::villager, 'Villager', false, taskTypes::none, 'The village plower.');
         $this->roles[RoleId::werewolf] = new Role(RoleId::werewolf, 'Werewolf', true, taskTypes::night, 'Stalking your prey at night you kill and devour the bodies of the villagers one by one.');
-        $this->roles[RoleId::clown] = new Role(RoleId::clown, 'Clown', false, taskTypes::none, 'You are the Village clown, you play pranks on the villagers at night and though you are good, you are sometimes mistaken for bad');
+        $this->roles[RoleId::clown] = new Role(RoleId::clown, 'Clown', false, taskTypes::night, 'You are the Village clown, you play pranks on the villagers at night and though you are good, you are sometimes mistaken for bad');
         $this->roles[RoleId::drunk] = new Role(RoleId::drunk, 'Drunk', false, taskTypes::none, 'You are the village drunk, too drunk to do anything at night');
     }
     private function process(): void {
@@ -34,7 +34,7 @@ class Game {
         //check if enough players joined
         $players = getTelegramIdsFromChat($this->connection, $this->chatId);
         $this->players = count($players);
-        if ($this->players < 3) {
+        if ($this->players < 4) {
             //delete chat
             deleteChatId($this->connection, $this->chatId);
             $this->sendMessage($this->chatId, 'Joining period ended! Not enough players present to start the game!');
@@ -94,6 +94,16 @@ class Game {
                         $this->sendMessage($this->chatId, getPlayerName($this->connection, $targetId).' was eaten by the wolf!');
                         $this->sendMessage($targetId, 'NOM NOM you were eaten!');
                     }
+                    elseif ($player['role'] === RoleId::clown) {
+                        $targetId = $player['took_action_on'];
+                        if($targetId !== 0) {
+                            //prank target
+                           takeActionOn($this->connection, $targetId);
+                           $this->players--;
+                            $this->sendMessage($targetId, 'You wake up to the sound of a door slamming, as you turn on the light you see your house is covered in honey, the clown has pranked you!');
+                        }
+                    }
+                    } 
                 }
             }
             if ($this->taskTime === taskTypes::day) {
