@@ -197,7 +197,7 @@ class Game {
             $text .= '['.$player['name'].'](tg://user?id='.$player['telegram_id'].') - '.$this->roles[$player['role']]->getName();
             if ($player['dead']) $text .= ' (Dead)';
             else $text .= ' (Alive)';
-            if ($this->roles[$player['role']]->getEvil() && $this->baddies > 0) $text .= ' *Won*';
+            if ($this->roles[$player['role']]->getEvil() && $this->baddies > 0 || !$this->roles[$player['role']]->getEvil()) $text .= ' *Won*';
             else $text .= ' *Lost*';
             $text .= chr(10);
         }
