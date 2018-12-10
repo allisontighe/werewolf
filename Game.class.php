@@ -91,19 +91,17 @@ class Game {
                         //kill target
                         killPlayer($this->connection, $targetId);
                         $this->players--;
+                        //TODO: check if baddie, if yes decrease baddie count
                         $this->sendMessage($this->chatId, getPlayerName($this->connection, $targetId).' was eaten by the wolf!');
                         $this->sendMessage($targetId, 'NOM NOM you were eaten!');
                     }
-                    elseif ($player['role'] === RoleId::clown) {
-                        $targetId = $player['took_action_on'];
-                        if($targetId !== 0) {
-                            //prank target
-                           takeActionOn($this->connection, $targetId);
-                           $this->players--;
-                            $this->sendMessage($targetId, 'You wake up to the sound of a door slamming, as you turn on the light you see your house is covered in honey, the clown has pranked you!');
-                        }
+                }
+                else if ($player['role'] === RoleId::clown) {
+                    $targetId = $player['took_action_on'];
+                    if($targetId !== 0) {
+                        //prank target
+                        $this->sendMessage($targetId, 'You wake up to the sound of a door slamming, as you turn on the light you see your house is covered in honey, the clown has pranked you!');
                     }
-                    } 
                 }
             }
             if ($this->taskTime === taskTypes::day) {
