@@ -92,8 +92,12 @@ class Game {
                         //kill target
                         killPlayer($this->connection, $targetId);
                         $this->players--;
-                        //TODO: check if baddie, if yes decrease baddie count
-                        $this->sendMessage($this->chatId, getPlayerName($this->connection, $targetId).' was eaten by the wolf!');
+                        //check if baddie, if yes decrease baddie count
+                        $index = array_search($targetId, array_column($players, 'telegram_id'));
+                        if ($this->roles[$players[$index]['role']]->getEvil()) {
+                            $this->baddies--;
+                        }
+                        $this->sendMessage($this->chatId, $players[$index]['name'].' was eaten by the wolf! He was a '.$this->roles[$players[$index]['role']]->getName());
                         $this->sendMessage($targetId, 'NOM NOM you were eaten!');
                     }
                 }
