@@ -116,7 +116,7 @@ class Game {
                 }
             }
             if ($player['role'] === RoleId::slacker && $player['status'] === Status::offline && $this->day > 0) {
-                setPlayerStatus($this->connection, $this->telegramId, Status::none);
+                setPlayerStatus($this->connection, $player['telegram_id'], Status::none);
                 $this->sendMessage($this->chatId, '['.$player['name'].'](tg://user?id='.$player['telegram_id'].') joins the game!');
             }
             if ($this->taskTime === taskTypes::day) {
