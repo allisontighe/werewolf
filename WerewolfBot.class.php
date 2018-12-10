@@ -22,17 +22,18 @@ class WerewolfBot extends Bot {
         else if ($command === '/newgame') {
             //check if a game is already running
             if (doesChatIdExist($this->connection, $this->chatId)) {
-                http_response_code(200);
-                exit('A game is already running!');
+                $this->sendEcho('A game is already running :D');
             }
-            addChat($this->connection, $this->chatId);
-            addToGame($this->connection, $this->chatId, $this->telegramId, $this->firstName);
-            $this->sendEcho('A werewolf game is starting!');
-            //execute game script
-            $curl = curl_init('https://'.$_SERVER['HTTP_HOST'].'/Game.php?chat_id='.$this->chatId);
-            curl_setopt($curl, CURLOPT_TIMEOUT_MS, 100);
-            curl_exec($curl);
-            curl_close($curl);
+            else {
+                addChat($this->connection, $this->chatId);
+                addToGame($this->connection, $this->chatId, $this->telegramId, $this->firstName);
+                $this->sendEcho('A werewolf game is starting!');
+                //execute game script
+                $curl = curl_init('https://'.$_SERVER['HTTP_HOST'].'/Game.php?chat_id='.$this->chatId);
+                curl_setopt($curl, CURLOPT_TIMEOUT_MS, 100);
+                curl_exec($curl);
+                curl_close($curl);
+            }
         }
         else if ($command === '/eat' && $parameter !== false) {
             if (doesTelegramIdExist($this->connection, $parameter) && !isDead($this->connection, $parameter)) {
