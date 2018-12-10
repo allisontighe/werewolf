@@ -57,7 +57,7 @@ class Game {
         }
     }
     private function prepare() {
-        $players = getPlayerData($this->connection, $this->chatId);
+        $players = getAlivePlayerData($this->connection, $this->chatId);
         if ($this->taskTime === taskTypes::night) {
             $this->sendMessage($this->chatId, 'Night has started! Players have 60 seconds to conduct their actions!');
         }
@@ -83,7 +83,7 @@ class Game {
         }
     }
     private function run() {
-        $players = getPlayerData($this->connection, $this->chatId);
+        $players = getAllPlayerData($this->connection, $this->chatId);
         $lynchArray = [];
         foreach($players as $player) {
             if($this->roles[$player['role']]->getTaskType() === $this->taskTime) {
