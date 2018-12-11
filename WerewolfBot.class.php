@@ -35,28 +35,21 @@ class WerewolfBot extends Bot {
                 curl_close($curl);
             }
         }
-        else if ($command === '/eat' && $parameter !== false) {
+        else if ($command === '/act' && $parameter !== false) {
             if (doesTelegramIdExist($this->connection, $parameter) && !isDead($this->connection, $parameter)) {
                 takeActionOn($this->connection, $this->telegramId, $parameter);
-                $this->editMessage($this->chatId, $this->messageId, 'Target chosen!');
-            }
-            else $this->sendEcho('Invalid target!');
-            }
-            else if ($command === '/prank' && $parameter !== false){
-                if (doesTelegramIdExist($this->connection, $parameter) && !isDead($this->connection, $parameter)){
-                    takeActionOn($this->connection, $this->telegramId, $parameter);
-                    $this->editMessage($this->chatId, $this->messageId, 'Target Chosen!');
+                $this->editMessage($this->chatId, $this->messageId, 'You chose *'.getPlayerName($this->connection, $parameter).'*!');
             }
             else $this->sendEcho('Invalid target!');
         }
         else if ($command === '/lynch' && $parameter !== false) {
             if (doesTelegramIdExist($this->connection, $parameter) && !isDead($this->connection, $parameter)) {
                 takeActionOn($this->connection, $this->telegramId, $parameter);
-                $this->editMessage($this->chatId, $this->messageId, 'Target chosen!');
-                $chatId = getChatId($this->connection, $this->telegramId);
                 $playerName = getPlayerName($this->connection, $this->telegramId);
                 $targetName = getPlayerName($this->connection, $parameter);
-                $this->sendMessageToPlayer($playerName.' has decided to lynch '.$targetName.'!', $chatId);
+                $this->editMessage($this->chatId, $this->messageId, 'You have chosen to lynch *'.$targetName.'*!');
+                $chatId = getChatId($this->connection, $this->telegramId);
+                $this->sendMessageToPlayer('*'.$playerName.'* has decided to lynch *'.$targetName.'*!', $chatId);
             }
             else $this->sendEcho('Invalid target!');
         }

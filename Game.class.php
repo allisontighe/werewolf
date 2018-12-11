@@ -74,10 +74,10 @@ class Game {
         foreach($players as $player) {
             if($this->roles[$player['role']]->getTaskType() === $this->taskTime) {
                 if ($player['role'] === RoleId::werewolf) {
-                    $this->sendMessage($player['telegram_id'], 'Who do you want to eat tonight?', generateKeyboard($player, $players, 'eat'));
+                    $this->sendMessage($player['telegram_id'], 'Who do you want to eat tonight?', generateKeyboard($player, $players));
                 }
                 else if ($player['role'] === RoleId::clown) {
-                    $this->sendMessage($player['telegram_id'], 'Who do you want to prank tonight?', generateKeyboard($player, $players, 'prank'));
+                    $this->sendMessage($player['telegram_id'], 'Who do you want to prank tonight?', generateKeyboard($player, $players));
                 }
             }
             if ($this->taskTime === taskTypes::day) {

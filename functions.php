@@ -110,7 +110,7 @@ function makePlayerList(Connection $connection, int $chatId): string {
     }
     return $string;
 }
-function generateKeyboard(array $player, array $allPlayers, string $command): array {//generates keyboard with other players
+function generateKeyboard(array $player, array $allPlayers, string $command = 'act'): array {//generates keyboard with other players
     $keyboard = [];
     foreach($allPlayers as $otherPlayer) {
         if ($otherPlayer['telegram_id'] !== $player['telegram_id']) {
