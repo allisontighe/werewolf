@@ -66,7 +66,7 @@ class Game {
             $this->sendMessage($this->chatId, 'The day has started! Players have 60 seconds to decide who the culprit is!');
         }
         else if ($this->taskTime === taskTypes::evening) {
-            $this->sendMessage($this->chatId, 'Its evening time! Players have 60 seconds to conduct their actions!');
+            $this->sendMessage($this->chatId, 'Its evening time! Players have 60 seconds to decide who to lynch!');
         }
         //remove offline players
         foreach($players as $key => $player) {
@@ -86,7 +86,7 @@ class Game {
                     $this->messages[] = $this->sendMessage($player['telegram_id'], 'Who do you want to prank tonight?', generateKeyboard($player, $players));
                 }
             }
-            if ($this->taskTime === taskTypes::day) {
+            if ($this->taskTime === taskTypes::evening) {
                 //lynch options
                 $this->messages[] = $this->sendMessage($player['telegram_id'], 'Who do you want to lynch?', generateKeyboard($player, $players, 'lynch'));
             }
@@ -149,7 +149,7 @@ class Game {
                 else $lynchArray[$player['took_action_on']] = 1;
             }
         }
-        if ($this->taskTime === taskTypes::day) {
+        if ($this->taskTime === taskTypes::evening) {
             //get max voted for player key
             $lynchIds = array_keys($lynchArray, max($lynchArray));
             //see if more than one was max
