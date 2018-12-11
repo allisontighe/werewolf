@@ -27,7 +27,7 @@ class Game {
     }
     private function process(): void {
         //update chat status
-        setStatus($this->connection, $this->chatId, 1);
+        setStatus($this->connection, $this->chatId, ChatStatus::started);
         //make player list
         $playerListMessage = json_decode($this->sendMessage($this->chatId, makePlayerList($this->connection, $this->chatId)), true);
         updateMessageId($this->connection, $this->chatId, intval($playerListMessage['result']['message_id']));
@@ -162,6 +162,8 @@ class Game {
         $this->day++;
     }
     private function waitForJoiners() {
+        //set status
+        setStatus($this->connection, $this->chatId, ChatStatus::joiners);
         $keyboard = [[['text' => 'Join', 'url' => 'https://t.me/'.BotInfo::username.'?start='.$this->chatId]]];
         $limit = getWaitInterval($this->connection, $this->chatId);
         $messages = [];
@@ -181,6 +183,8 @@ class Game {
         }
     }
     private function assignRoles(array $players) {
+        //set status
+        setStatus($this->connection, $this->chatId, ChatStatus::roles);
         //shuffle players
         shuffle($players);
         $roles = divideRoles($this->roles);

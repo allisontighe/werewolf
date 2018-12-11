@@ -55,26 +55,31 @@ class WerewolfBot extends Bot {
         }
         else if ($command === '/extend' && $parameter !== false) {
             if (doesChatIdExist($this->connection, $this->chatId)) {
-                if (is_numeric($parameter)) {
-                    $timeLeft = getWaitInterval($this->connection, $this->chatId) * Interval::join;
-                    //see if addition is greater than 5 minutes
-                    if ($timeLeft + $parameter > 300) {
-                        //set to 5 minutes
-                        setWaitInterval($this->connection, $this->chatId, floor(300 / Interval::join));
-                        $this->sendEcho('Time left: *5:00* minutes!');
+                //get status
+                $status = getStatus($this->connection, $this->chatId);
+                if ($status === ChatStatus::joiners) {
+                    if (is_numeric($parameter)) {
+                        $timeLeft = getWaitInterval($this->connection, $this->chatId) * Interval::join;
+                        //see if addition is greater than 5 minutes
+                        if ($timeLeft + $parameter > 300) {
+                            //set to 5 minutes
+                            setWaitInterval($this->connection, $this->chatId, floor(300 / Interval::join));
+                            $this->sendEcho('Time left: *5:00* minutes!');
+                        }
+                        else if ($timeLeft + $parameter <= 0) {
+                            //set to 5 minutes
+                            setWaitInterval($this->connection, $this->chatId, 0);
+                            $this->sendEcho('The game will start soon!');
+                        }
+                        else {
+                            $changeBy = floor($parameter / Interval::join);
+                            changeWaitInterval($this->connection, $this->chatId, $changeBy);
+                            $this->sendEcho('Time left: *'.floor(($changeBy * Interval::join + $timeLeft) / 60).':'.(($changeBy * Interval::join + $timeLeft) % 60).'* minutes!');
+                        }
                     }
-                    else if ($timeLeft + $parameter <= 0) {
-                        //set to 5 minutes
-                        setWaitInterval($this->connection, $this->chatId, 0);
-                        $this->sendEcho('The game will start soon!');
-                    }
-                    else {
-                        $changeBy = floor($parameter / Interval::join);
-                        changeWaitInterval($this->connection, $this->chatId, $changeBy);
-                        $this->sendEcho('Time left: *'.floor(($changeBy * Interval::join + $timeLeft) / 60).':'.(($changeBy * Interval::join + $timeLeft) % 60).'* minutes!');
-                    }
+                    else $this->sendEcho('Sorry, I couldn\'t quite understand what you meant by that. Could you please enter a number? Please?');
                 }
-                else $this->sendEcho('Sorry, I couldn\'t quite understand what you meant by that. Could you please enter a number? Please?');
+                else $this->sendEcho('Sorry, `/extend` can be run only during the joining period.');
             }
             else $this->sendEcho('No game\'s running in the first place :P');
         }

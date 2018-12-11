@@ -98,6 +98,11 @@ function setStatus(Connection $connection, int $chatId, int $status): void {
     $PDOStatement = $connection->prepare('UPDATE chats SET status = ? WHERE chat_id = ?');
     $PDOStatement->execute([$status, $chatId]);
 }
+function getStatus(Connection $connection, int $chatId): int {
+    $PDOStatement = $connection->prepare('SELECT status FROM chats WHERE chat_id = ?');
+    $PDOStatement->execute([$chatId]);
+    return $PDOStatement->fetchColumn();
+}
 function setPlayerStatus(Connection $connection, int $telegramId, int $status): void {
     $PDOStatement = $connection->prepare('UPDATE players SET status = ? WHERE telegram_id = ?');
     $PDOStatement->execute([$status, $telegramId]);

@@ -22,3 +22,9 @@ abstract class Status {
     public const none = 0;
     public const offline = 1;
 }
+abstract class ChatStatus {
+    public const new = 0;
+    public const started = 1;
+    public const joiners = 2;
+    public const roles = 3;
+}
