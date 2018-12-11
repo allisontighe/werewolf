@@ -214,8 +214,7 @@ class Game {
         //shuffle players
         shuffle($players);
         $roles = divideRoles($this->roles);
-        $totalPlayers = count($players);
-        $baddies = ceil($totalPlayers / 5);
+        $baddies = ceil($this->players / 5);
         foreach($players as $player) {
             if ($this->baddies < $baddies) {
                 //set random evil role
