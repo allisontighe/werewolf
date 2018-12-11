@@ -11,6 +11,7 @@ class Game {
     private $players = 0;
     private $taskTime;
     private $day = 0;
+    private $messages = [];
     public function __construct(Connection $connection, int $chatId) {
         $this->connection = $connection;
         $this->chatId = $chatId;
@@ -74,19 +75,21 @@ class Game {
         foreach($players as $player) {
             if($this->roles[$player['role']]->getTaskType() === $this->taskTime) {
                 if ($player['role'] === RoleId::werewolf) {
-                    $this->sendMessage($player['telegram_id'], 'Who do you want to eat tonight?', generateKeyboard($player, $players));
+                    $this->messages[] = $this->sendMessage($player['telegram_id'], 'Who do you want to eat tonight?', generateKeyboard($player, $players));
                 }
                 else if ($player['role'] === RoleId::clown) {
-                    $this->sendMessage($player['telegram_id'], 'Who do you want to prank tonight?', generateKeyboard($player, $players));
+                    $this->messages[] = $this->sendMessage($player['telegram_id'], 'Who do you want to prank tonight?', generateKeyboard($player, $players));
                 }
             }
             if ($this->taskTime === taskTypes::day) {
                 //lynch options
-                $this->sendMessage($player['telegram_id'], 'Who do you want to lynch?', generateKeyboard($player, $players, 'lynch'));
+                $this->messages[] = $this->sendMessage($player['telegram_id'], 'Who do you want to lynch?', generateKeyboard($player, $players, 'lynch'));
             }
         }
     }
     private function run() {
+        //delete messages
+        $this->deleteMessageArray();
         $players = getPlayerData($this->connection, $this->chatId);
         $lynchArray = [];
         foreach($players as $player) {
@@ -161,26 +164,30 @@ class Game {
         //increase day
         $this->day++;
     }
+    private function deleteMessageArray() {
+        foreach ($this->messages as $message) {
+            //decode
+            $message = json_decode($message, true);
+            //delete join message
+            $this->deleteMessage($message['result']['message_id'], $this->chatId);
+        }
+        //reset
+        $this->messages = [];
+    }
     private function waitForJoiners() {
         //set status
         setStatus($this->connection, $this->chatId, ChatStatus::joiners);
         $keyboard = [[['text' => 'Join', 'url' => 'https://t.me/'.BotInfo::username.'?start='.$this->chatId]]];
         $limit = getWaitInterval($this->connection, $this->chatId);
-        $messages = [];
         while ($limit > 0) {
-            $messages[] = $this->sendMessage($this->chatId, ($limit * Interval::join).' seconds left to join!', $keyboard);
+            $this->messages[] = $this->sendMessage($this->chatId, ($limit * Interval::join).' seconds left to join!', $keyboard);
             sleep(Interval::join);
             //decrease interval
             changeWaitInterval($this->connection, $this->chatId, -1);
             //get new interval
             $limit = getWaitInterval($this->connection, $this->chatId);
         }
-        foreach ($messages as $message) {
-            //decode
-            $message = json_decode($message, true);
-            //delete join message
-            $this->deleteMessage($message['result']['message_id'], $this->chatId);
-        }
+        $this->deleteMessageArray();
     }
     private function assignRoles(array $players) {
         //set status
