@@ -214,24 +214,36 @@ class Game {
         //shuffle players
         shuffle($players);
         $roles = divideRoles($this->roles);
-        $baddies = ceil($this->players / 5);
+        $baddies = ceil($this->players / rand(5, 8));
         foreach($players as $player) {
-            if ($this->baddies < $baddies) {
+            if ($this->baddies < $baddies && count($roles['evil']) > 0) {
                 //set random evil role
-                $role = $roles['evil'][array_rand($roles['evil'])];
-                setRole($this->connection, $this->chatId, $player, $role->getId());
+                $index = array_rand($roles['evil']);
+                setRole($this->connection, $this->chatId, $player, $roles['evil'][$index]->getId());
                 $this->baddies++;
+                //message player
+                $this->sendMessage($player, $roles['evil'][$index]->getDescription());
+                //unset - so that this role is not repeated again
+                unset($roles['evil'][$index]);
             }
-            else {
+            else if (count($roles['good']) > 0) {
                 //set a good role
-                $role = $roles['good'][array_rand($roles['good'])];
-                setRole($this->connection, $this->chatId, $player, $role->getId());
-                if ($role->getId() === RoleId::slacker) {
+                $index = array_rand($roles['good']);
+                setRole($this->connection, $this->chatId, $player, $roles['good'][$index]->getId());
+                //message player
+                $this->sendMessage($player, $roles['good'][$index]->getDescription());
+                //unset so as NOT to repeat
+                unset($roles['good'][$index]);
+                //slacker
+                if ($roles['good'][$index]->getId() === RoleId::slacker) {
                     setPlayerStatus($this->connection, $player, Status::offline); //set offline status for slacker
                 }
             }
-            //message player
-            $this->sendMessage($player, $role->getDescription());
+            else {
+                //assign as villager!
+                setRole($this->connection, $this->chatId, $player, RoleId::villager);
+                $this->sendMessage($player, $this->roles[RoleId::villager]->getDescription());
+            }
         }
     }
     private function endGame() {
