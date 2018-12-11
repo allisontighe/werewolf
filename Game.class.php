@@ -141,7 +141,7 @@ class Game {
                 setPlayerStatus($this->connection, $player['telegram_id'], Status::none);
                 $this->sendMessage($this->chatId, '['.$player['name'].'](tg://user?id='.$player['telegram_id'].') joins the game!');
             }
-            if ($this->taskTime === taskTypes::day) {
+            if ($this->taskTime === taskTypes::evening) {
                 //do lynch stuff
                 if (array_key_exists($player['took_action_on'], $lynchArray)) {
                     $lynchArray[$player['took_action_on']]++;
