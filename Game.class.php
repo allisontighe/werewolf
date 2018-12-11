@@ -232,12 +232,12 @@ class Game {
                 setRole($this->connection, $this->chatId, $player, $roles['good'][$index]->getId());
                 //message player
                 $this->sendMessage($player, $roles['good'][$index]->getDescription());
-                //unset so as NOT to repeat
-                unset($roles['good'][$index]);
                 //slacker
                 if ($roles['good'][$index]->getId() === RoleId::slacker) {
                     setPlayerStatus($this->connection, $player, Status::offline); //set offline status for slacker
                 }
+                //unset so as NOT to repeat
+                unset($roles['good'][$index]);
             }
             else {
                 //assign as villager!
