@@ -75,7 +75,12 @@ class Game {
         foreach($players as $player) {
             if($this->roles[$player['role']]->getTaskType() === $this->taskTime) {
                 if ($player['role'] === RoleId::werewolf) {
-                    $this->messages[] = $this->sendMessage($player['telegram_id'], 'Who do you want to eat tonight?', generateKeyboard($player, $players));
+                    if ($player['status'] === Status::drunk) {
+                        $this->messages[] = $this->sendMessage($player['telegram_id'], 'You experience a hangover due to yesterday\'s alcoholic meal.');
+                    }
+                    else {
+                        $this->messages[] = $this->sendMessage($player['telegram_id'], 'Who do you want to eat tonight?', generateKeyboard($player, $players));
+                    }
                 }
                 else if ($player['role'] === RoleId::clown) {
                     $this->messages[] = $this->sendMessage($player['telegram_id'], 'Who do you want to prank tonight?', generateKeyboard($player, $players));
@@ -96,18 +101,32 @@ class Game {
             if($this->roles[$player['role']]->getTaskType() === $this->taskTime) {
                 //do task depending on role
                 if ($player['role'] === RoleId::werewolf) {
-                    $targetId = $player['took_action_on'];
-                    if ($targetId !== 0) {
-                        //kill target
-                        killPlayer($this->connection, $targetId);
-                        $this->players--;
-                        //check if baddie, if yes decrease baddie count
-                        $index = array_search($targetId, array_column($players, 'telegram_id'));
-                        if ($this->roles[$players[$index]['role']]->getEvil()) {
-                            $this->baddies--;
+                    //check if drunk
+                    if ($player['status'] !== Status::drunk) {
+                        $targetId = $player['took_action_on'];
+                        if ($targetId !== 0) {
+                            //kill target
+                            killPlayer($this->connection, $targetId);
+                            $this->players--;
+                            //check if baddie, if yes decrease baddie count
+                            $index = array_search($targetId, array_column($players, 'telegram_id'));
+                            if ($this->roles[$players[$index]['role']]->getEvil()) {
+                                $this->baddies--;
+                            }
+                            //check if drunk
+                            if ($players[$index]['role'] === RoleId::drunk) {
+                                //wolf is now drunk!
+                                setPlayerStatus($this->connection, $player['telegram_id'], Status::drunk);
+                                $this->sendMessage($player['telegram_id'], 'You have consumed alcoholic flesh! You will be unable to eat anyone the next round.');
+                            }
+                            $this->sendMessage($this->chatId, '*'.$players[$index]['name'].'* was eaten by the wolf! '.$players[$index]['name'].' was a *'.$this->roles[$players[$index]['role']]->getName().'*.');
+                            $this->sendMessage($targetId, 'NOM NOM you were eaten!');
                         }
-                        $this->sendMessage($this->chatId, '*'.$players[$index]['name'].'* was eaten by the wolf! '.$players[$index]['name'].' was a *'.$this->roles[$players[$index]['role']]->getName().'*.');
-                        $this->sendMessage($targetId, 'NOM NOM you were eaten!');
+                    }
+                    else {
+                        //if yes, cure
+                        setPlayerStatus($this->connection, $player['telegram_id'], Status::none);
+                        $this->sendMessage($player['telegram_id'], 'You recover from your hangover!');
                     }
                 }
                 else if ($player['role'] === RoleId::clown) {

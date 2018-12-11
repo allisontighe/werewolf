@@ -21,6 +21,7 @@ abstract class Interval {
 abstract class Status {
     public const none = 0;
     public const offline = 1;
+    public const drunk = 2;
 }
 abstract class ChatStatus {
     public const new = 0;
