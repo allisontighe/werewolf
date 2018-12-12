@@ -266,10 +266,11 @@ class Game {
                     }
                     else {
                         $text .= ' *Lost*';
+                    }
                 }
             $text .= chr(10);
-    }
-        }
+                    }
+                }
         $this->sendMessage($this->chatId, $text);
         $this->sendMessage($this->chatId, 'The game has ended!');
         deleteChatId($this->connection, $this->chatId);
