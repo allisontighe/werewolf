@@ -260,6 +260,13 @@ class Game {
                 else {
                     $text .= ' *Lost*';
                 }
+                if (!$this->roles[$player['role']]->getEvil()) {
+                    if ($this->baddies < 0) {
+                        $text .= ' *Won*';
+                    }
+                    else {
+                        $text .= ' *Lost*';
+                }
             $text .= chr(10);
     }
         }
