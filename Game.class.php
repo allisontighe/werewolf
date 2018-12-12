@@ -252,10 +252,16 @@ class Game {
         foreach($players as $player) {
             $text .= '['.$player['name'].'](tg://user?id='.$player['telegram_id'].') - '.$this->roles[$player['role']]->getName();
             if ($player['dead']) $text .= ' (Dead)';
-            else $text .= ' (Alive)';
-             if ($this->roles[$player['role']]->getEvil() && $this->baddies > 0 || $this->roles[$player['role']]->getEvil()) $text .= ' *Won*';
-            else $text .= ' *Lost*';
+            else $text.= ' (Alive)';
+            if ($this->roles[$player['role']]->getEvil()) {
+                if ($this->baddies > 0) {
+                    $text .= ' *Won*';
+                }
+                else {
+                    $text .= ' *Lost*';
+                }
             $text .= chr(10);
+    }
         }
         $this->sendMessage($this->chatId, $text);
         $this->sendMessage($this->chatId, 'The game has ended!');
