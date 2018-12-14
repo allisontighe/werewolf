@@ -132,13 +132,13 @@ class Game
                     } else {
                         //if yes, cure
                         setPlayerStatus($this->connection, $player['telegram_id'], Status::none);
-                        $this->sendMessage($player['telegram_id'], 'You recover from your hangover!');
+                        $this->sendMessage($player['telegram_id'], 'You recover from your hangover, angrier than ever!');
                     }
                 } else if ($player['role'] === RoleId::clown) {
                     $targetId = $player['took_action_on'];
                     if ($targetId !== 0) {
                         //prank target
-                        $this->sendMessage($targetId, 'You wake up to the sound of a door slamming, as you turn on the light you see your house is covered in honey, the clown has pranked you!');
+                        $this->sendMessage($targetId, 'You wake up in fear as a werewolf stares at you in your bed, certain you are about to be devoured you hear the sound of laughing as the clown removes his mask and runs away');
                     }
                 }
             }
@@ -159,7 +159,7 @@ class Game
             //see if more than one was max
             if (count($lynchIds) > 1) {
                 //if so, dont lynch
-                $this->sendMessage($this->chatId, 'The villagers were unable to come up with a decision!');
+                $this->sendMessage($this->chatId, '* The villagers were unable to come up with a decision!*');
             } else {
                 //lynch!
                 killPlayer($this->connection, $lynchIds[0]);
@@ -171,8 +171,8 @@ class Game
                     $this->baddies--;
                 }
                 //announce
-                $this->sendMessage($lynchIds[0], 'You were lynched!');
-                $this->sendMessage($this->chatId, $players[$playerIndex]['name'] . ' was lynched! ' . $players[$playerIndex]['name'] . ' was a ' . $this->roles[$players[$playerIndex]['role']]->getName() . '!');
+                $this->sendMessage($lynchIds[0], ' *You were lynched!*');
+                $this->sendMessage($this->chatId, $players[$playerIndex]['name'] . '* was lynched!* ' . $players[$playerIndex]['name'] . ' was a ' . $this->roles[$players[$playerIndex]['role']]->getName() . '!');
             }
         }
         //clear actions
